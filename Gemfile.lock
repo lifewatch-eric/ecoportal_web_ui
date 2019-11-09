@@ -94,7 +94,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
-    crass (1.0.3)
+    crass (1.0.5)
     cube-ruby (0.0.3)
     daemons (1.2.5)
     dalli (2.7.6)
@@ -136,7 +136,7 @@ GEM
     logstash-event (1.1.5)
     logstash-logger (0.3.0)
       logstash-event
-    loofah (2.1.1)
+    loofah (2.3.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lz4-ruby (0.3.3)
