@@ -13,6 +13,29 @@ require 'ontologies_api_client'
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  
+  before_action :set_locale
+
+  # Sets the locale based on the locale cookie or the value returned by detect_locale.
+  def set_locale    
+    I18n.locale = cookies[:locale] || detect_locale
+    cookies.permanent[:locale] = I18n.locale if cookies[:locale].nil?
+  end
+
+  # Returns detedted locale based on the Accept-Language header of the request or the default locale if none is found.
+  def detect_locale    
+    languages = request.headers['Accept-Language']&.split(',')
+    supported_languages = I18n.available_locales
+
+    Array(languages).each do |language|
+      language_code = language.split(/[-;]/).first.downcase.to_sym
+      return language_code if supported_languages.include?(language_code)
+    end
+    
+    return I18n.default_locale 
+  end
+  
+
   helper :all # include all helpers, all the time
   helper_method :bp_config_json, :current_license, :using_captcha?
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_record
@@ -62,6 +85,10 @@ class ApplicationController < ActionController::Base
   before_action :set_global_thread_values, :domain_ontology_set, :authorize_miniprofiler, :clean_empty_strings_from_params_arrays, :init_trial_license
 
 
+  def show_image_modal
+    url = params[:url]
+    render turbo_stream: helpers.prepend('application_modal_content') { helpers.image_tag(url, style:'width: 100%') }
+  end
 
   def set_global_thread_values
     Thread.current[:session] = session
@@ -421,6 +448,8 @@ class ApplicationController < ActionController::Base
 
   def get_class(params)
 
+    lang = request_lang
+    
     if @ontology.flat?
 
       ignore_concept_param = params[:conceptid].nil? ||
@@ -437,7 +466,7 @@ class ApplicationController < ActionController::Base
         @concept.children = []
       else
         # Display only the requested class in the tree
-        @concept = @ontology.explore.single_class({full: true}, params[:conceptid])
+        @concept = @ontology.explore.single_class({full: true, lang: lang }, params[:conceptid])
         @concept.children = []
       end
       @root = LinkedData::Client::Models::Class.new
@@ -446,24 +475,27 @@ class ApplicationController < ActionController::Base
     else
 
       # not ignoring 'bp_fake_root' here
+      include = 'prefLabel,hasChildren,obsolete'
       ignore_concept_param = params[:conceptid].nil? ||
           params[:conceptid].empty? ||
           params[:conceptid].eql?("root")
       if ignore_concept_param
         # get the top level nodes for the root
         # TODO_REV: Support views? Replace old view call: @ontology.top_level_classes(view)
-        roots = @ontology.explore.roots(concept_schemes: params[:concept_schemes])
-        if roots.nil? || roots.empty?
-          LOG.add :debug, "Missing roots for #{@ontology.acronym}"
-          not_found("Missing roots for #{@ontology.acronym}")
+        @roots = @ontology.explore.roots(concept_schemes: params[:concept_schemes])        
+        if @roots.nil? || @roots.empty?
+          LOG.add :debug, "Missing @roots for #{@ontology.acronym}"
+          @concept = @ontology.explore.classes.collection.first.explore.self(full: true)
+          return
         end
+        
         @root = LinkedData::Client::Models::Class.new(read_only: true)
-        @root.children = roots.sort{|x,y| (x.prefLabel || "").downcase <=> (y.prefLabel || "").downcase}
+        @root.children = @roots.sort{|x,y| (x.prefLabel || "").downcase <=> (y.prefLabel || "").downcase}
 
         # get the initial concept to display
         root_child = @root.children.first
 
-        @concept = root_child.explore.self(full: true)
+        @concept = root_child.explore.self(full: true, lang: lang)
         # Some ontologies have "too many children" at their root. These will not process and are handled here.
         if @concept.nil?
           LOG.add :debug, "Missing class #{root_child.links.self}"
@@ -471,22 +503,23 @@ class ApplicationController < ActionController::Base
         end
       else
         # if the id is coming from a param, use that to get concept
-        @concept = @ontology.explore.single_class({full: true}, params[:conceptid])
+        @concept = @ontology.explore.single_class({full: true, lang: lang}, params[:conceptid])
         if @concept.nil? || @concept.errors
           LOG.add :debug, "Missing class #{@ontology.acronym} / #{params[:conceptid]}"
           not_found("Missing class #{@ontology.acronym} / #{params[:conceptid]}")
         end
 
         # Create the tree
-        rootNode = @concept.explore.tree(include: "prefLabel,hasChildren,obsolete", concept_schemes: params[:concept_schemes])
+        rootNode = @concept.explore.tree(include: include, concept_schemes: params[:concept_schemes], lang: lang)
         if rootNode.nil? || rootNode.empty?
-          roots = @ontology.explore.roots(concept_schemes: params[:concept_schemes])
-          if roots.nil? || roots.empty?
-            LOG.add :debug, "Missing roots for #{@ontology.acronym}"
-            not_found("Missing roots for #{@ontology.acronym}")
+          @roots = @ontology.explore.roots(concept_schemes: params[:concept_schemes])
+          if @roots.nil? || @roots.empty?
+            LOG.add :debug, "Missing @roots for #{@ontology.acronym}"
+            @concept = @ontology.explore.classes.collection.first.explore.self(full: true)
+            return
           end
-          if roots.any? {|c| c.id == @concept.id}
-            rootNode = roots
+          if @roots.any? {|c| c.id == @concept.id}
+            rootNode = @roots
           else
             rootNode = [@concept]
           end
@@ -499,13 +532,6 @@ class ApplicationController < ActionController::Base
     @concept
   end
 
-  def get_metrics_hash
-    metrics_hash = {}
-    # TODO: Metrics do not return for views on the backend, need to enable include_views param there
-    @metrics = LinkedData::Client::Models::Metrics.all(include_views: true)
-    @metrics.each {|m| metrics_hash[m.links['ontology']] = m }
-    return metrics_hash
-  end
 
   def get_ontology_submission_ready(ontology)
     # Get the latest 'ready' submission
@@ -756,6 +782,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :submission_metadata
 
+  def request_lang
+    helpers.request_lang
+  end
   private
   def not_found_record(exception)
     @error_message = exception.message

@@ -26,13 +26,29 @@ module ConceptsHelper
     end
   end
 
+  def sub_menu_active?(section)
+    params["sub_menu"]&.eql? section
+  end
+
+  def sub_menu_active_class(section)
+    "active show" if sub_menu_active?(section)
+  end
+
+  def default_sub_menu?
+    !sub_menu_active?('list') && !sub_menu_active?('date')
+  end
+  
+  def default_sub_menu_class
+    "active show" if default_sub_menu?
+  end
+
   def concept_label(ont_id, cls_id)
     @ontology = LinkedData::Client::Models::Ontology.find(ont_id)
     @ontology ||= LinkedData::Client::Models::Ontology.find_by_acronym(ont_id).first
     ontology_not_found(ont_id) unless @ontology
     # Retrieve a class prefLabel or return the class ID (URI)
     # - mappings may contain class URIs that are not in bioportal (e.g. obo-xrefs)
-    cls = @ontology.explore.single_class(cls_id)
+    cls = @ontology.explore.single_class({language: request_lang, include: 'prefLabel'}, cls_id)
     # TODO: log any cls.errors
     # TODO: NCBO-402 might be implemented here, but it throws off a lot of ajax result rendering.
     #cls_label = cls.prefLabel({:use_html => true}) || cls_id
@@ -50,7 +66,7 @@ module ConceptsHelper
   end
 
   def sorted_by_date_url(page = 1, last_concept = nil)
-    out = "/ajax/classes/date_sorted_list?ontology=#{@ontology.acronym}&page=#{page}"
+    out = "/ajax/classes/date_sorted_list?ontology=#{@ontology.acronym}&page=#{page}&language=#{request_lang}"
     out += "&last_date=#{concept_date(last_concept)}" if last_concept
     out
   end

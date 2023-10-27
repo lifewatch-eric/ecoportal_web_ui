@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import BrowseFiltersController from "./browse_filters_controller"
+application.register("browse-filters", BrowseFiltersController)
+
 import ChosenController from "./chosen_controller"
 application.register("chosen", ChosenController)
 
@@ -12,6 +15,15 @@ application.register("class-search-auto-complete", ClassSearchAutoCompleteContro
 
 import ContainerSplitterController from "./container_splitter_controller"
 application.register("container-splitter", ContainerSplitterController)
+
+import FairScoreHomeController from "./fair_score_home_controller"
+application.register("fair-score-home", FairScoreHomeController)
+
+import FairScoreLandscapeController from "./fair_score_landscape_controller"
+application.register("fair-score-landscape", FairScoreLandscapeController)
+
+import FairScoreSummaryController from "./fair_score_summary_controller"
+application.register("fair-score-summary", FairScoreSummaryController)
 
 import FormAutoCompleteController from "./form_auto_complete_controller"
 application.register("form-auto-complete", FormAutoCompleteController)
@@ -25,14 +37,30 @@ application.register("label-ajax", LabelAjaxController)
 import LabelsAjaxContainerController from "./labels_ajax_container_controller"
 application.register("labels-ajax-container", LabelsAjaxContainerController)
 
+import LanguageChangeController from "./language_change_controller"
+application.register("language-change", LanguageChangeController)
+
 import LoadChartController from "./load_chart_controller"
 application.register("load-chart", LoadChartController)
 
 import MetadataDownloaderController from "./metadata_downloader_controller"
 application.register("metadata-downloader", MetadataDownloaderController)
 
+import OntologyRelationsNetworkController from "./ontology_relations_network_controller"
+application.register("ontology-relations-network", OntologyRelationsNetworkController)
+
+import OntologyViewerTabsController from "./ontology_viewer_tabs_controller"
+application.register("ontology-viewer-tabs", OntologyViewerTabsController)
+
 import OntoportalAutocompleteController from "./ontoportal_autocomplete_controller"
 application.register("ontoportal-autocomplete", OntoportalAutocompleteController)
+
+import ShowFilterCountController from "./show_filter_count_controller"
+application.register("show-filter-count", ShowFilterCountController)
+
+
+import PlatformLanguageController from "./platform_language_controller"
+application.register("platform-language", PlatformLanguageController)
 
 import ShowModalController from "./show_modal_controller"
 application.register("show-modal", ShowModalController)
@@ -43,8 +71,14 @@ application.register("simple-tree", SimpleTreeController)
 import SkosCollectionColorsController from "./skos_collection_colors_controller"
 application.register("skos-collection-colors", SkosCollectionColorsController)
 
+import TextTruncateController from "./text_truncate_controller"
+application.register("text-truncate", TextTruncateController)
+
 import TooltipController from "./tooltip_controller"
 application.register("tooltip", TooltipController)
+
+import TopnavResponsivenessController from "./topnav_responsiveness_controller"
+application.register("topnav-responsiveness", TopnavResponsivenessController)
 
 import TurboFrameController from "./turbo_frame_controller"
 application.register("turbo-frame", TurboFrameController)

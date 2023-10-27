@@ -6,6 +6,23 @@ require 'digest/sha1'
 require 'pry' # used in a rescue
 
 module ApplicationHelper
+  REST_URI = $REST_URL
+  API_KEY = $API_KEY
+
+  include ModalHelper, MultiLanguagesHelper
+
+  RESOLVE_NAMESPACE = {:omv => "http://omv.ontoware.org/2005/05/ontology#", :skos => "http://www.w3.org/2004/02/skos/core#", :owl => "http://www.w3.org/2002/07/owl#",
+                       :rdf => "http://www.w3.org/1999/02/22-rdf-syntax-ns#", :rdfs => "http://www.w3.org/2000/01/rdf-schema#", :metadata => "http://data.bioontology.org/metadata/",
+                       :metadata_def => "http://data.bioontology.org/metadata/def/", :dc => "http://purl.org/dc/elements/1.1/", :xsd => "http://www.w3.org/2001/XMLSchema#",
+                       :oboinowl_gen => "http://www.geneontology.org/formats/oboInOwl#", :obo_purl => "http://purl.obolibrary.org/obo/",
+                       :umls => "http://bioportal.bioontology.org/ontologies/umls/", :door => "http://kannel.open.ac.uk/ontology#", :dct => "http://purl.org/dc/terms/",
+                       :void => "http://rdfs.org/ns/void#", :foaf => "http://xmlns.com/foaf/0.1/", :vann => "http://purl.org/vocab/vann/", :adms => "http://www.w3.org/ns/adms#",
+                       :voaf => "http://purl.org/vocommons/voaf#", :dcat => "http://www.w3.org/ns/dcat#", :mod => "http://www.isibang.ac.in/ns/mod#", :prov => "http://www.w3.org/ns/prov#",
+                       :cc => "http://creativecommons.org/ns#", :schema => "http://schema.org/", :doap => "http://usefulinc.com/ns/doap#", :bibo => "http://purl.org/ontology/bibo/",
+                       :wdrs => "http://www.w3.org/2007/05/powder-s#", :cito => "http://purl.org/spar/cito/", :pav => "http://purl.org/pav/", :nkos => "http://w3id.org/nkos/nkostype#",
+                       :oboInOwl => "http://www.geneontology.org/formats/oboInOwl#", :idot => "http://identifiers.org/idot/", :sd => "http://www.w3.org/ns/sparql-service-description#",
+                       :cclicense => "http://creativecommons.org/licenses/"}
+
 
   def get_apikey
     unless session[:user].nil?
@@ -13,6 +30,18 @@ module ApplicationHelper
     else
       return LinkedData::Client.settings.apikey
     end
+  end
+
+  def omniauth_providers_info
+    $OMNIAUTH_PROVIDERS
+  end
+
+  def omniauth_provider_info(strategy)
+    omniauth_providers_info.select {|k,v| v[:strategy].eql?(strategy.to_sym) || k.eql?(strategy)}
+  end
+
+  def omniauth_token_provider(strategy)
+    omniauth_provider_info(strategy).keys.first
   end
 
   def isOwner?(id)
@@ -26,6 +55,7 @@ module ApplicationHelper
       end
     end
   end
+  
 
   def encode_param(string)
     CGI.escape(string)
@@ -157,8 +187,8 @@ module ApplicationHelper
   def build_tree(node, string, id, concept_schemes: [])
 
     return string if node.children.nil? || node.children.empty?
-
-    node.children.sort! { |a, b| (a.prefLabel || a.id).downcase <=> (b.prefLabel || b.id).downcase }
+    
+    node.children.sort! { |a, b| (main_language_label(a.prefLabel) || a.id).downcase <=> (main_language_label(a.prefLabel) || b.id).downcase }
     node.children.each do |child|
       active_style = child.id.eql?(id) ? "active" : ''
 
@@ -184,19 +214,33 @@ module ApplicationHelper
   end
 
   def tree_link_to_concept(child:, ontology_acronym:, active_style:, node: nil)
+    language = request_lang
     li_id = child.id.eql?('bp_fake_root') ? 'bp_fake_root' : short_uuid
     open = child.expanded? ? "class='open'" : ''
     icons = child.relation_icon(node)
     muted_style = child.isInActiveScheme&.empty? ? 'text-muted' : ''
-    href = ontology_acronym.blank? ? '#' : "/ontologies/#{child.explore.ontology.acronym}/concepts/?id=#{CGI.escape(child.id)}"
+    href = ontology_acronym.blank? ? '#' : "/ontologies/#{child.explore.ontology.acronym}/concepts/?id=#{CGI.escape(child.id)}&language=#{language}"
+
+    if child.prefLabel.nil?
+      prefLabelHTML =  child.id.split('/').last
+    else
+      prefLabelLang, prefLabelHTML = select_language_label(child.prefLabel)
+      prefLabelLang = prefLabelLang.to_s.upcase
+      tooltip = prefLabelLang.eql?("@NONE") ? "" : "data-controller='tooltip' data-tooltip-position-value='right' title='#{prefLabelLang}'";
+    end
+
     link = <<-EOS
-        <a id='#{child.id}' data-conceptid='#{child.id}'
-           data-turbo=true data-turbo-frame='concept_show' href='#{href}' 
-           data-collections-value='#{child.memberOf || []}'
-           data-active-collections-value='#{child.isInActiveCollection || []}'
-           data-skos-collection-colors-target='collection'
-            class='#{muted_style} #{active_style}'>
-            #{child.prefLabel ? child.prefLabel({ use_html: true }) : child.id}
+        <a id='#{child.id}' 
+        data-conceptid='#{child.id}'
+        data-turbo=true data-turbo-frame='concept_show' href='#{href}' 
+        data-collections-value='#{child.memberOf || []}'
+        data-active-collections-value='#{child.isInActiveCollection || []}'
+        data-skos-collection-colors-target='collection'
+        class='#{muted_style} #{active_style}'
+        #{tooltip}
+          >
+            #{ prefLabelHTML }
+            
         </a>
     EOS
 
@@ -204,9 +248,10 @@ module ApplicationHelper
   end
 
   def tree_link_to_children(child:, concept_schemes: [])
+    language = request_lang
     li_id = child.id.eql?('bp_fake_root') ? 'bp_fake_root' : short_uuid
     concept_schemes = concept_schemes.map{|x| CGI.escape(x)}.join(',')
-    link = "<a id='#{child.id}' href='/ajax_concepts/#{child.explore.ontology.acronym}/?conceptid=#{CGI.escape(child.id)}&concept_schemes=#{concept_schemes}&callback=children'>ajax_class</a>"
+    link = "<a id='#{child.id}' href='/ajax_concepts/#{child.explore.ontology.acronym}/?conceptid=#{CGI.escape(child.id)}&concept_schemes=#{concept_schemes}&callback=children&language=#{language}'>ajax_class</a>"
     "<ul class='ajax'><li id='#{li_id}'>#{link}</li></ul>"
   end
 
@@ -246,6 +291,23 @@ module ApplicationHelper
             <i class="#{icon} d-flex"></i> #{text}
           </a>
     BLOCK
+  end
+
+  def error_message_text
+    @errors = @errors[:error] if @errors && @errors[:error]
+    if @errors.is_a?(String)
+      @errors
+    else
+      "Errors in fields #{@errors.keys.join(', ')}"
+    end
+  end
+
+  def error_message_alert
+    return if @errors.nil?
+
+    content_tag(:div, class: 'my-1') do
+      render Display::AlertComponent.new(message: error_message_text, type: 'danger', closable: false)
+    end
   end
 
   def anonymous_user
@@ -339,14 +401,14 @@ module ApplicationHelper
   def metadata_for_select
     get_metadata
     return @metadata_for_select
-  end 
+  end
 
   def get_metadata
     @metadata_for_select = []
     submission_metadata.each do |data|
       @metadata_for_select << data["attribute"]
     end
-  end    
+  end
 
 
   def ontologies_to_acronyms(ontologyIDs)
@@ -398,17 +460,23 @@ module ApplicationHelper
                     class: "add_proposal btn btn-primary", data: { show_modal_title_value: "Add a new proposal"}
     end
   end
- 
+
   def subscribe_button(ontology_id)
+    ontology_acronym = ontology_id.split('/').last
+
     if session[:user].nil?
-      return link_to 'Subscribe to notes emails', "/login?redirect=#{request.url}", {style:'font-size: .9em;', class:'link_button'}
+      link = "/login?redirect=#{request.url}"
+      subscribed = false
+      user_id = nil
+    else
+      user = LinkedData::Client::Models::User.find(session[:user].id)
+      subscribed = subscribed_to_ontology?(ontology_acronym, user)
+      link = "javascript:void(0);"
+      user_id = user.id
     end
 
-    user = LinkedData::Client::Models::User.find(session[:user].id)
-    ontology_acronym = ontology_id.split('/').last
-    subscribed = subscribed_to_ontology?(ontology_acronym, user)
-
-    render OntologySubscribeButtonComponent.new(ontology_id: ontology_id, subscribed: subscribed, user_id: user.id)
+    count = count_subscriptions(ontology_id)
+    render OntologySubscribeButtonComponent.new(ontology_id: ontology_id, subscribed: subscribed, user_id: user_id, count: count, link: link)
   end
 
   def subscribed_to_ontology?(ontology_acronym, user)
@@ -451,14 +519,14 @@ module ApplicationHelper
     #return DateTime.xmlschema( xml_date_time_str ).to_date.to_s
   end
 
-  def flash_class(level)
+  def notification_type(flash_key)
     bootstrap_alert_class = {
-      'notice' => 'alert-info',
-      'success' => 'alert-success',
-      'error' => 'alert-danger',
-      'alert' => 'alert-danger'
+      'notice' => 'success',
+      'success' => 'success',
+      'error' => 'error',
+      'alert' => 'alert'
     }
-    bootstrap_alert_class[level]
+    bootstrap_alert_class[flash_key]
   end
 
   ###BEGIN ruby equivalent of JS code in bp_ajax_controller.
@@ -468,7 +536,7 @@ module ApplicationHelper
   end
 
   def bp_class_link(cls_id, ont_acronym)
-    return "#{bp_ont_link(ont_acronym)}?p=classes&conceptid=#{escape(cls_id)}"
+    return "#{bp_ont_link(ont_acronym)}?p=classes&conceptid=#{escape(cls_id)}&language=#{request_lang}"
   end
 
   def bp_scheme_link(scheme_id, ont_acronym)
@@ -495,23 +563,22 @@ module ApplicationHelper
   end
 
   def label_ajax_data(cls_id, ont_acronym, ajax_uri, cls_url)
-    tag.attributes label_ajax_data_h(cls_id, ont_acronym, ajax_uri, cls_url)
+    label_ajax_data_h(cls_id, ont_acronym, ajax_uri, cls_url)
   end
 
-  def label_ajax_link(link, cls_id, ont_acronym, ajax_uri, cls_url, target = '')
-    href_cls = " href='#{link}'"
+  def label_ajax_link(link, cls_id, ont_acronym, ajax_uri, cls_url, target = nil)
     data = label_ajax_data(cls_id, ont_acronym, ajax_uri, cls_url)
-    style = 'btn btn-sm btn-light'
-    "<a data-controller='label-ajax' class='#{style}' #{data} #{href_cls} #{target}>#{cls_id}</a>"
+    options = {  'data-controller': 'label-ajax' }.merge(data)
+    options = options.merge({ target: target }) if target
+
+    render ChipButtonComponent.new(url: link, text: cls_id, type: 'clickable', **options)
   end
 
   def get_link_for_cls_ajax(cls_id, ont_acronym, target = nil)
-    target = target.nil? ? '' : " target='#{target}' "
-
     if cls_id.start_with?('http://') || cls_id.start_with?('https://')
       link = bp_class_link(cls_id, ont_acronym)
       ajax_url = '/ajax/classes/label'
-      cls_url = "?p=classes&conceptid=#{CGI.escape(cls_id)}"
+      cls_url = "/ontologies/#{ont_acronym}?p=classes&conceptid=#{CGI.escape(cls_id)}"
       label_ajax_link(link, cls_id, ont_acronym, ajax_url , cls_url ,target)
     else
       auto_link(cls_id, :all, target: '_blank')
@@ -527,64 +594,40 @@ module ApplicationHelper
 
   def get_link_for_scheme_ajax(scheme, ont_acronym, target = '_blank')
     link = bp_scheme_link(scheme, ont_acronym)
-    ajax_url = '/ajax/schemes/label'
+    ajax_url = "/ajax/schemes/label?language=#{request_lang}"
     scheme_url = "?p=schemes&schemeid=#{CGI.escape(scheme)}"
     label_ajax_link(link, scheme, ont_acronym, ajax_url, scheme_url, target)
   end
 
   def get_link_for_collection_ajax(collection, ont_acronym, target = '_blank')
     link = bp_collection_link(collection, ont_acronym)
-    ajax_url = '/ajax/collections/label'
+    ajax_url = "/ajax/collections/label?language=#{request_lang}"
     collection_url = "?p=collections&collectionid=#{CGI.escape(collection)}"
     label_ajax_link(link, collection, ont_acronym, ajax_url, collection_url, target)
   end
 
 
-  def get_link_for_label_xl_ajax(label_xl, ont_acronym, cls_id)
+  def get_link_for_label_xl_ajax(label_xl, ont_acronym, cls_id, modal: true)
     link = label_xl
     ajax_uri = "/ajax/label_xl/label?cls_id=#{CGI.escape(cls_id)}"
     label_xl_url = "/ajax/label_xl/?id=#{CGI.escape(label_xl)}&ontology=#{ont_acronym}&cls_id=#{CGI.escape(cls_id)}"
     data = label_ajax_data_h(label_xl, ont_acronym, ajax_uri, label_xl_url)
     data[:data][:controller] = 'label-ajax'
+    if modal
+      link_to_modal(cls_id, link, {data: data[:data] , class: 'btn btn-sm btn-light'})
+    else
+      link_to(link,'', {data: data[:data], class: 'btn btn-sm btn-light', target: '_blank'})
+    end
+     
 
-    link_to_modal(cls_id, link, {data: data[:data] , class: 'btn btn-sm btn-light'})
   end
 
   ###END ruby equivalent of JS code in bp_ajax_controller.
-  def ontology_viewer_page_name(ontology_name, concept_name_title , page)
-    ontology_name + " | " +concept_name_title + " - #{page.capitalize}"
+  def ontology_viewer_page_name(ontology_name, concept_label, page)
+    ontology_name + " | " + main_language_label(concept_label) + " - #{page.capitalize}"
   end
 
-  def link_to_modal(name, options = nil, html_options = nil, &block)
 
-    new_data = {
-      controller: 'show-modal', turbo: true,
-      turbo_frame: 'application_modal_content',
-      action: 'click->show-modal#show'
-    }
-
-    html_options[:data].merge!(new_data) do |_, old, new|
-      "#{old} #{new}"
-    end
-    if name.nil?
-      link_to(options, html_options, &block)
-    else
-      link_to(name, options, html_options)
-    end
-  end
-  def submit_to_modal(name, html_options = nil, &block)
-    new_data = {
-      controller: 'show-modal', turbo: true,
-      turbo_frame: 'application_modal_content',
-      action: 'click->show-modal#show'
-    }
-
-    html_options[:data].merge!(new_data) do |_, old, new|
-      "#{old} #{new}"
-    end
-
-    submit_tag(name || "save", html_options)
-  end
 
   def uri?(url)
     url =~ /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/
@@ -605,5 +648,50 @@ module ApplicationHelper
   def skos?
     submission = @submission || @submission_latest
     submission&.hasOntologyLanguage === 'SKOS'
+  end
+
+  def current_page?(path)
+    request.path.eql?(path)
+  end
+
+  def request_lang
+    lang = params[:language] || params[:lang]
+    lang = 'EN' unless lang
+    lang.upcase
+  end
+
+  def bp_config_json
+    # For config settings, see
+    # config/bioportal_config.rb
+    # config/initializers/ontologies_api_client.rb
+    config = {
+      org: $ORG,
+      org_url: $ORG_URL,
+      site: $SITE,
+      org_site: $ORG_SITE,
+      ui_url: $UI_URL,
+      apikey: LinkedData::Client.settings.apikey,
+      userapikey: get_apikey,
+      rest_url: LinkedData::Client.settings.rest_url,
+      proxy_url: $PROXY_URL,
+      biomixer_url: $BIOMIXER_URL,
+      annotator_url: $ANNOTATOR_URL,
+      ncbo_annotator_url: $NCBO_ANNOTATOR_URL,
+      ncbo_apikey: $NCBO_API_KEY,
+      interportal_hash: $INTERPORTAL_HASH,
+      resolve_namespace: RESOLVE_NAMESPACE
+    }
+    config[:ncbo_slice] = @subdomain_filter[:acronym] if (@subdomain_filter[:active] && !@subdomain_filter[:acronym].empty?)
+    config.to_json
+  end
+  def portal_name
+    $SITE
+    end
+  def navitems
+    items = [["/ontologies", "Browse"],["/mappings", "Mappings"],["/recommender", "Recommender"],["/annotator", "Annotator"], ["/landscape", "Landscape"]]
+  end
+
+  def attribute_enforced_values(attr)
+    submission_metadata.select {|x| x['@id'][attr]}.first['enforcedValues']
   end
 end
