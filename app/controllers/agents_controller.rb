@@ -3,11 +3,13 @@ class AgentsController < ApplicationController
   before_action :authorize_and_redirect, :only => [:edit, :update, :create, :new]
 
   def index
-    @agents = LinkedData::Client::Models::Agent.all
+    @agents = LinkedData::Client::Models::Agent.all(include: 'all')
   end
 
   def show
-    @agent = LinkedData::Client::Models::Agent.all(name: params[:name]).find { |x| x.name.eql?(params[:name]) }
+    @agent = LinkedData::Client::Models::Agent.find(params[:id])
+    not_found("Agent with id #{@agent.id}") if @agent.nil?
+
     @agent_id = params[:id] || agent_id(@agent)
     @name_prefix = params[:name_prefix] ? "#{params[:name_prefix]}[#{params[:id]}]" : ''
     @edit_on_modal = params[:edit_on_modal]&.eql?('true')
@@ -85,6 +87,15 @@ class AgentsController < ApplicationController
 
       render_turbo_stream(*streams)
     end
+  end
+
+  def agent_usages
+    @agent = LinkedData::Client::Models::Agent.where({display: 'all'}) do |obj|
+      obj.id.eql?("#{REST_URI}/Agents/#{params[:id]}")
+    end.first
+
+    not_found("Agent with id #{@agent.id}") if @agent.nil?
+    render partial: 'agents/agent_usage'
   end
 
   def destroy

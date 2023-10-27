@@ -122,7 +122,8 @@
       -# Agents  tab
       %div.tab-pane.fade{id: "agents", role: "tabpanel", aria: { labelledby: "agents-admin-tab" }, class: selected_admin_section?('agents') ? 'show active': ''}
         %div.ontologies_list_container.mt-3
-          = render TurboFrameComponent.new(id: 'agents-list', src: '/agents', loading: 'lazy')
+          %div.mx-auto.w-75
+            = render TurboFrameComponent.new(id: 'agents-list', src: '/agents', loading: 'lazy')
 
 
 
