@@ -171,7 +171,7 @@ $SITE_NOTICE = {}
 $TERMS_AND_CONDITIONS_LINK = 'https://doc.jonquetlab.lirmm.fr/share/e6158eda-c109-4385-852c-51a42de9a412/doc/terms-conditions-naDsDo2Zxq'
 $CITE_ANNOTATOR = 'https://hal.science/hal-00492024'
 $ANNOTATOR_API_DOC = 'https://data.agroportal.lirmm.fr/documentation#nav_annotator'
-$CITE_RECOMMENDER = 'https://doi.org/10.1186/s13326-017-0128-y' 
+$CITE_RECOMMENDER = 'https://doi.org/10.1186/s13326-017-0128-y'
 # Resource term
 $RESOURCE_TERM = ENV['RESOURCE_TERM'] || 'ontology'
 
@@ -298,7 +298,7 @@ $FOOTER_LINKS = {
   social: [
     { logo: "social/people.svg", link: "https://github.com/orgs/agroportal/people" },
     { logo: "social/github.svg", link: "https://github.com/agroportal" },
-    { logo: "social/twitter.svg", link: "https://twitter.com/lagroportal" },
+    { logo: "social/bluesky.svg", link: "https://bsky.app/profile/lifewatcheric.bsky.social" },
     { logo: "json.svg", link: $REST_URL },
     { logo: "summary/sparql.svg", link: "#{$SPARQL_URL}"},
     { logo: "social/email.svg", link: "mailto:#{$ANNOUNCE_LIST}" },
@@ -315,7 +315,7 @@ $FOOTER_LINKS = {
       contact_us: "https://#{$SITE}.lirmm.fr/feedback",
       documentation: "https://ontoportal.github.io/documentation/",
       agro_documentation: "https://doc.jonquetlab.lirmm.fr/share/e6158eda-c109-4385-852c-51a42de9a412/doc/public-documentation-QMpsC9aVBb",
-      issues_and_requests: $GITHUB_ISSUES 
+      issues_and_requests: $GITHUB_ISSUES
     },
     agreements: {
       terms: $TERMS_AND_CONDITIONS_LINK,

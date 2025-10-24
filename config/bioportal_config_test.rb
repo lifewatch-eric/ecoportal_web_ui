@@ -140,7 +140,7 @@ $FOOTER_LINKS = {
   social: [
     { logo: 'social/people.svg', link: 'https://github.com/orgs/agroportal/people' },
     { logo: 'social/github.svg', link: 'https://github.com/agroportal' },
-    { logo: 'social/twitter.svg', link: 'https://twitter.com/lagroportal' }
+    { logo: "social/bluesky.svg", link: "https://bsky.app/profile/lifewatcheric.bsky.social" },
   ],
   sections: {
     products: {
