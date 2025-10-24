@@ -329,7 +329,7 @@ en:
     fill_text: Please fill in the proper text from the supplied image
     notice_feedback: Feedback has been sent
     account_title: Account Information
-    agroportal_figures: "%{site} in figures"
+    agroportal_figures: "%{site} in numbers"
     benefit1: Browse, search and get recommendations for semantic resources relevant to your research.
     benefit2: Annotate text by using terms from standardised semantic resources.
     benefit3: Programmatically access the content of semantic resources to create semantically enriched applications.
