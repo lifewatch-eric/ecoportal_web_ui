@@ -18,7 +18,8 @@ class HomeController < ApplicationController
       t('home.benefit2'),
       t('home.benefit3'),
       t('home.benefit4'),
-      t('home.benefit5')
+      t('home.benefit5'),
+      t('home.benefit6')
     ]
 
     @anal_ont_names = []
