@@ -550,8 +550,9 @@ en:
     create_new_mapping: Create new mapping
     all: All
     description: Dive into an overview of the mappings in the bubble view, efficiently locate a specific semantic resource in the table view or upload your own mappings.
+    intro_guide:  The Mappings allows users to link terms across semantic artefacts, showing similarities between concepts. In the Bubble View, each bubble represents an artefact - clicking one reveals connected artefacts, and selecting a pair shows term mappings. Use the three tabs (Bubble View, Table View, and Upload Mappings) to explore, browse, or add your own mappings.
     tabs:
-      bubble_view: Bubbles view
+      bubble_view: Bubble view
       table_view: Table view
       upload_mappings: Upload mappings
     types_description:

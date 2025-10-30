@@ -18,7 +18,7 @@ class BubbleData {
  * @param {number} logScaleFactor - The logarithmic scale factor for bubble size calculation.
  */
 
-export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarget, normalization_ratio, logScaleFactor) {
+export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarget, normalization_ratio, logScaleFactor, offset) {
   // Define pack layout
   const pack = d3.pack()
     .size([width - margin, height - margin])
@@ -48,14 +48,14 @@ export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarge
 
   // Create circles
   const circle = node.append('circle')
-    .attr('r', d => d.r)
+    .attr('r', d => { console.log(d); return d.r; })
     .style('fill', 'var(--primary-color)');
 
   // Display ontology names and mappings
   const textOntology = node.append('text')
     .attr('dy', '.35em')
     .style('text-anchor', 'middle')
-    .style('font-size', '16px')
+    .style('font-size', '8px')
     .style('fill', 'white')
     .style('font-weight', '600')
     .text(d => displayOntologyName(d));
@@ -63,12 +63,12 @@ export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarge
   const textMappings = node.append('text')
     .attr('dy', '1.5em')
     .style('text-anchor', 'middle')
-    .style('font-size', '12px')
+    .style('font-size', '8px')
     .style('fill', 'white')
-    .text(d => displayMappings(d));
+    .text(d => displayMappings(d, offset));
 
   // Show tooltips on hover
-  circle.on('mouseover', (event, d) => showTooltip(event, d))
+  circle.on('mouseover', (event, d) => showTooltip(event, d, offset))
     .on('mouseout', () => hideTooltip());
 
   // Function to calculate bubble size
@@ -78,16 +78,16 @@ export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarge
 
   // Function to display ontology name
   function displayOntologyName(d) {
-    return (d.r > d.data.ontology_name.length * 5 && d.r > 20) ? d.data.ontology_name : '';
+    return d.data.ontology_name;
   }
 
   // Function to display mappings count
-  function displayMappings(d) {
-    return (d.r > d.data.ontology_name.length * 5 && d.r > 20) ? d.data.ontology_mappings : '';
+  function displayMappings(d, offset) {
+    return d.data.ontology_mappings - offset;
   }
 
   // Function to show tooltip
-  function showTooltip(event, d) {
+  function showTooltip(event, d, offset) {
     if (!(d.r > d.data.ontology_name.length * 5 && d.r > 20)) {
       // Remove existing tooltip
       d3.selectAll('.bubble-tooltip').remove();
@@ -98,7 +98,7 @@ export function useMappingsDrawBubbles(data, width, height, margin, bubblesTarge
         .attr('class', 'bubble-tooltip')
         .style('left', `${event.pageX + 10}px`) // Adjust position relative to mouse pointer
         .style('top', `${event.pageY + 10}px`) // Adjust position relative to mouse pointer
-        .html(`<strong>${d.data.ontology_name}</strong><br>${d.data.ontology_mappings}`);
+        .html(`<strong>${d.data.ontology_name}</strong><br>${d.data.ontology_mappings - offset}`);
     }
   }
 
