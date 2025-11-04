@@ -53,6 +53,24 @@
 
     %button#propertiesBtn{:style => "margin-top: 1em;", :type => "button", :class => "btn btn-primary", :onclick => "toggleDiv('properties')"}= t("landscape.more_properties_charts")
 
+    %div#propertiesDiv{:class => "panel panel-info", :style => "margin-top: 2em;"}
+      %div{:class => "panel-heading"}
+        %h3{:class => "panel-title"}= t("landscape.ontology_properties_pie_charts")
+      %div{:class => "panel-body"}
+        %div{:class => "row"}
+          %div{:class => "col-md-3"}
+            %h2= t("landscape.owl_ontology_preflabel_uris")
+            %div#prefLabelPropertyPieChartDiv
+          %div{:class => "col-md-3"}
+            %h2= t("landscape.owl_ontology_synonym_uris")
+            %div#synonymPropertyPieChartDiv
+          %div{:class => "col-md-3"}
+            %h2= t("landscape.owl_ontology_definition_uris")
+            %div#definitionPropertyPieChartDiv
+          %div{:class => "col-md-3"}
+            %h2= t("landscape.owl_ontology_author_uris")
+            %div#authorPropertyPieChartDiv
+
     %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
 
     %div{:class => "panel panel-success", :style => "margin-top: 2em;"}
