@@ -52,6 +52,7 @@ en:
     errors_in_fields: Errors in fields %{errors}
     add_comment: Add comment
     add_new_comment: Add a new comment
+    download_comments: Download comments
     reply: Reply
     add_proposal: Add proposal
     add_new_proposal: Add a new proposal
@@ -918,6 +919,8 @@ en:
     new_relationship_proposal: New Relationship Proposal
     change_property_value_proposal: Change Property Value Proposal
     new_comment_added: New comment added successfully
+    comment_archived: Comment archived successfully
+    comment_unarchived: Comment unarchived successfully
     note_deleted_successfully: Note %{note_id}  was deleted successfully
     note_not_found: Note %{note_id}  was not found in the system
     comment: Comment
@@ -941,7 +944,11 @@ en:
       save: Save
     note_line:
       alert_text: "Are you sure you want to delete the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
+      alert_archive_text: "Are you sure you want to archive the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
+      alert_unarchive_text: "Are you sure you want to unarchive the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
       delete: Delete
+      archive: Archive
+      unarchive: Unarchive
       archived: archived
       comment: Comment
     thread:

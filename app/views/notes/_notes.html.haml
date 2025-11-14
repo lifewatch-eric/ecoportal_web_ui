@@ -6,6 +6,9 @@
       = add_comment_button(parent_id, parent_type)
     .add_proposal.mx-1
       = add_proposal_button(parent_id, parent_type)
+    .add_proposal.mx-1
+      %div{'data-controller': 'notes', 'data-action': 'click->notes#downloadCSV', 'type': 'button', 'class': 'secondary-button regular-button slim'}
+        = t('application.download_comments')
 
   = render_alerts_container("notes_#{parent_type}_list_table_alerts")
 
