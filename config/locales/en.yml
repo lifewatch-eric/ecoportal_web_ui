@@ -143,7 +143,7 @@ en:
       metadata_administration: Metadata Administration
       groups: Groups
       categories: Categories
-      persons_and_organizations: Persons & Organizations
+      persons_and_organizations: Persons & Organisations
       sparql: SPARQL
       search: Search & Indexation
       jobs: Process Scheduling
@@ -418,7 +418,7 @@ en:
     number_of_ontologies_using_format: Number of semantic resources using this format
     number_of_ontologies_of_type: Number of semantic resources of this semantic resource type
     number_of_ontologies_of_formality_level: Number of semantic resources of this formality level
-    number_of_ontologies_in_catalog: Number of semantic resources in this catalog
+    number_of_ontologies_in_catalog: Number of semantic resources in this catalogue
     number_of_ontologies: Number of semantic resources
     number_of_ontologies_with_class_count_in_range: Number of semantic resources with a class count in this range
     average: Average
@@ -428,13 +428,13 @@ en:
     average_metrics: Average metrics
     category: category
     filter_network: Filter network
-    funding_endorsing_organizations: Organizations funding and endorsing the most semantic resources
+    funding_endorsing_organizations: Organisations funding and endorsing the most semantic resources
     group: group
     groups_and_categories: Groups and Categories
     intro: Visualize the panorama of all semantic resources on %{site} via metadata aggregation.
     more_properties_charts: More properties charts
     most_active_ontologies: Most active semantic resources
-    most_active_organizations: Most active organizations
+    most_active_organizations: Most active organisations
     most_active_people: Most active people
     most_active_people_as_reviewer: Most active user account
     most_mentioned_people: Most mentioned people as contact, creator, contributor or curator
@@ -442,7 +442,7 @@ en:
     ontologies_activity_on: Semantic resource activity
     ontologies_by: Semantic resources by %{type}
     ontologies_contributors:  Contributors to ontology development
-    ontologies_count_by_catalog: Number of semantic resources in each semantic artefact catalog
+    ontologies_count_by_catalog: Number of semantic resources in each semantic artefact catalogue
     ontologies_formats: Representation language
     ontologies_languages: Natural languages
     ontologies_licenses: Licenses
@@ -662,7 +662,7 @@ en:
     form:
       type: Type
       person: Person
-      organization: Organization
+      organization: Organisation
       name: Name
       email: Email
       acronym: Acronym
@@ -1057,7 +1057,7 @@ en:
     deprecated_help: "A semantic resource with status retired shall necessarily be also deprecated, but not the opposite."
     known_usage_help: "Consider also declaring %{metadata_knownUsage_help}"
     known_usage_help_link: "the projects that are using the semantic resource"
-    help_creator: "The following properties take for value an 'agent' in %{portal_name} (either a person or an organization). These agents are shared over all the semantic resources and suggested with autocompletion if they already exist. Editing an agent here will change it to all the semantic resources that agent is involved in."
+    help_creator: "The following properties take for value an 'agent' in %{portal_name} (either a person or an organisation). These agents are shared over all the semantic resources and suggested with autocompletion if they already exist. Editing an agent here will change it to all the semantic resources that agent is involved in."
     version_help: "For more information on how to encode versioning information in a semantic resource, see %{link}"
     version_helper_link: "guidelines and recommendations."
   instances:
@@ -1258,7 +1258,7 @@ en:
       identifiers: Identifiers
       identifiers_tooltip: Principal identifiers of the semantic resource.
       dates: Dates
-      person_and_organization: Persons and organizations
+      person_and_organization: Persons and organisations
       other_links: Other links
       info_tooltip_links: Metadata properties that highlight the links enabling access to datasets, downloading semantic resources, etc
       projects_and_usage_information: Projects and usage information
@@ -1489,7 +1489,7 @@ en:
     privacy_link: "Privacy Statement"
   taxonomy:
     groups_and_categories: Groups and Categories
-    description: "In %{portal}, ontologies are organized in groups and tagged with categories. Typically, groups associate ontologies from the same project or organization for better identification of the provenance. Whereas categories are about subjects/topics and enable to classify ontologies. As of 2016, %{portal}'s categories were established in cooperation with FAO AIMS. In 2024, we moved to UNESCO Thesaurus (https://vocabularies.unesco.org). Groups and categories, along with other metadata, can be used on the “Browse” page of %{portal} to filter out the list of ontologies."
+    description: "The categories section of %{portal} organises semantic resources into key thematic areas relevant to the ecological and other related domains. These categories were originally taken from GEMET or defined internally and integrated in 2024 to align with the top categories with the UNESCO Thesaurus, enabling a more structured and accessible browsing experience."
     show_sub_categories: Show sub categories
     no_taxonomy_created: "No %{type} are created yet"
   federation:
