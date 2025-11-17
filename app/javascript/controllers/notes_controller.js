@@ -8,7 +8,7 @@ export default class extends Controller {
     for (let i = 0; i < rows.length; i++) {
         const row = [], cols = rows[i].querySelectorAll('td, th');
         for (let j = 0; j < cols.length; j++) {
-            const data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+            let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
             data = data.replace(/"/g, '""');
             row.push(data);
         }
