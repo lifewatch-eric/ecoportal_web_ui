@@ -228,7 +228,14 @@ var dataCatalogContext = document.getElementById("dataCatalogCanvas").getContext
 var dataCatalogChart = new Chart(dataCatalogContext, {
   type: 'bar',
   data: landscapeData["dataCatalogChartJson"],
-  options: barChartOptions()
+  options: Object.assign(barChartOptions(), {
+    layout: {
+      padding: {
+        left: 40,
+        bottom: 30
+      }
+    }
+  })
 });
 
 // Generate group bar chart

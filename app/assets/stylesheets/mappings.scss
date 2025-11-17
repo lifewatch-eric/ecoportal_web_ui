@@ -29,8 +29,8 @@
   cursor: pointer;
 }
 .mappings-bubble-view-frame{
-  width: 600px;
-  height: 600px;
+  width: 800px;
+  height: 800px;
   overflow: auto;
 }
 
@@ -84,7 +84,7 @@
   color: white;
   border-radius: 4px;
   pointer-events: none;
-  z-index: 9999; 
+  z-index: 9999;
 }
 
 .upload-mappings{
@@ -189,7 +189,7 @@
 }
 .bubble-view-legend-item .title span{
   font-weight: 400;
-} 
+}
 
 .mappings-bubble-size-legend, .mappings-bubble-color-legend{
   display: flex;

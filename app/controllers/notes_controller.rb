@@ -1,7 +1,7 @@
 class NotesController < ApplicationController
   include TurboHelper
   layout 'ontology'
- 
+
   NOTES_PROPOSAL_TYPES = {
     ProposalNewClass:  t('notes.new_class_proposal'),
     ProposalChangeHierarchy: t('notes.new_relationship_proposal'),
@@ -146,17 +146,25 @@ class NotesController < ApplicationController
   end
 
   def archive
-    ontology = DataAccess.getLatestOntology(params[:ontology_virtual_id])
+    note_id = params[:noteid]
+    note = LinkedData::Client::Models::Note.get(note_id)
+    ontology = LinkedData::Client::Models::Ontology.get(note.relatedOntology.first)
 
     unless ontology.admin?(session[:user])
       render :json => nil.to_json, :status => 500
       return
     end
 
-    @archive = DataAccess.archiveNote(params)
+    should_archive = note.archived ? false : true
 
-    unless @archive.nil?
-      render :json => @archive.to_json
+    note.update(values: {archived: should_archive})
+    parent_type = params[:parent_type].eql?('ontology') ? 'ontology' : 'class'
+
+    alerts_container_id = "notes_#{parent_type}_list_table_alerts"
+    if note.errors
+      render_turbo_stream alert_error(id: alerts_container_id) { note.errors.join(',').to_s }
+    else
+      render_turbo_stream(alert_success(id: alerts_container_id) { should_archive ? t('notes.comment_archived') : t('notes.comment_unarchived') })
     end
   end
 

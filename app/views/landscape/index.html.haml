@@ -34,14 +34,14 @@
 
   %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
   %h1= t("landscape.properties_use")
-  %p= t("landscape.properties_usage_proportion") 
+  %p= t("landscape.properties_usage_proportion")
   %div#pieChartDiv
     %div{:class => "row"}
       %div{:class => "col-md-4"}
         %h2= t("landscape.ontologies_languages")
         %div#naturalLanguagePieChartDiv
       %div{:class => "col-md-4"}
-        %h2= t("landscape.ontologies_licenses") 
+        %h2= t("landscape.ontologies_licenses")
         %div#licensePieChartDiv
       %div{:class => "col-md-4"}
         %h2= t("landscape.ontology_tools")
@@ -53,9 +53,7 @@
 
     %button#propertiesBtn{:style => "margin-top: 1em;", :type => "button", :class => "btn btn-primary", :onclick => "toggleDiv('properties')"}= t("landscape.more_properties_charts")
 
-    %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
-
-    %div{:class => "panel panel-success", :style => "margin-top: 2em;"}
+    %div#propertiesDiv{:class => "panel panel-info", :style => "margin-top: 2em;"}
       %div{:class => "panel-heading"}
         %h3{:class => "panel-title"}= t("landscape.ontology_properties_pie_charts")
       %div{:class => "panel-body"}
@@ -73,9 +71,7 @@
             %h2= t("landscape.owl_ontology_author_uris")
             %div#authorPropertyPieChartDiv
 
-          %div{:class => "col-md-4"}
-            %h2 Ontology types
-            %canvas#isOfTypeCanvas
+    %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
 
   %div{:class => "panel panel-success", :style => "margin-top: 2em;"}
     %div{:class => "panel-heading"}
@@ -94,9 +90,11 @@
           %h2= t("landscape.ontology_formality_levels")
           %canvas#formalityLevelCanvas
 
+    %hr{:style => "margin-top: 4em; margin-bottom: 4em;"}
+
     %div{:class => "panel panel-success", :style => "margin-top: 2em;"}
       %div{:class => "panel-heading"}
-        %h3{:class => "panel-title"} Contributors to ontologies development
+        %h3{:class => "panel-title"}= t("landscape.ontologies_contributors")
       %div{:class => "panel-body"}
         %div{:class => "row"}
           %div{:class => "col-md-6"}
@@ -104,25 +102,9 @@
             %p Most mentioned people as contact, creator, contributor, curator.
             %div#peopleCloudChart{:style => "width: 100%; height: 350px; margin-top: 2em; border-right: 1px solid #ccc;"}
           %div{:class => "col-md-6"}
-            %h2 Most active organizations
-            %p Organizations that fund and endorse the greatest number of ontologies.
+            %h2 Most active organisations
+            %p Organisations that fund and endorse the greatest number of ontologies.
             %div#orgCloudChart{:style => "width: 100%; height: 350px; margin-top: 2em;"}
-
-    %hr{:style => "margin-top: 4em; margin-bottom: 4em;"}
-
-  %div{:class => "panel panel-success", :style => "margin-top: 2em;"}
-    %div{:class => "panel-heading"}
-      %h3{:class => "panel-title"}= t("landscape.ontologies_contributors")
-    %div{:class => "panel-body"}
-      %div{:class => "row"}
-        %div{:class => "col-md-6"}
-          %h1= t("landscape.most_active_people")
-          %p= t("landscape.most_mentioned_people")
-          %div#peopleCloudChart{:style => "width: 100%; height: 350px; margin-top: 2em; border-right: 1px solid #ccc;"}
-        %div{:class => "col-md-6"}
-          %h1= t("landscape.most_active_organizations")
-          %p= t("landscape.funding_endorsing_organizations")
-          %div#orgCloudChart{:style => "width: 100%; height: 350px; margin-top: 2em;"}
 
     %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
 
@@ -140,14 +122,7 @@
           %h1= t("landscape.most_active_ontologies")
           %p= t("landscape.ontologies_with_notes_reviews_projects")
           %div#notesOntologiesCloudChart{:style => "width: 100%; height: 350px; margin-top: 2em;"}
-
-    %div{:style => "display: flex;"}
-      %div{:style => "text-align: left; width: 23em;"}
-        - @relations_array.each do |relation|
-          = check_box_tag "selectedRelations[]", relation, true, :id => relation
-          = label_tag relation, relation
-          %br
-        %button{:type => "button", :class => "btn btn-primary", :onclick => "buildNetwork(ontologyRelationsArray)", :style => "margin-bottom: 1em;"} Filter Network
+  %hr{:style => "margin-top: 5em; margin-bottom: 5em;"}
 
   %h1= t("landscape.ontology_relations_network")
   %p{:style => "margin-bottom: 1em;"}= t("landscape.relations_between_stored_ontologies", site: portal_name)
@@ -159,6 +134,10 @@
         = label_tag relation, relation
         %br
       %button{:type => "button", :class => "btn btn-primary", :onclick => "buildNetwork(ontologyRelationsArray)", :style => "margin-bottom: 1em;"}= t("landscape.filter_network")
+
+    %div{:style => "width: 100%;"}
+      %div#networkContainer{:style => "height: 80vh; width: 100%; border:1px solid #cecece;"}
+        %div#ontologyNetwork
 
 
   -if fairness_service_enabled?

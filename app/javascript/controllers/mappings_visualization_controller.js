@@ -16,18 +16,19 @@ export default class extends Controller {
 
     this.drawBubbles = (mappingsList) => {
       const zoomRatio = this.zoomRatioValue
-      const width = 600 * zoomRatio
-      const height = 600 * zoomRatio
+      const width = 800 * zoomRatio
+      const height = 800 * zoomRatio
       const margin = 1
-      const logScaleFactor = 10
+      const logScaleFactor = 6
+      const offset = 30
       const normalization_ratio =  this.#normalizationRatio(mappingsList)
 
       const data = Object.entries(mappingsList).map(([key, value]) => ({
         ontology_name: key.split('/').pop(),
-        ontology_mappings: value,
+        ontology_mappings: value + offset // add offset to avoid zero size bubbles,
       }))
       this.bubblesTarget.innerHTML = ''
-      useMappingsDrawBubbles(data, width, height, margin, this.bubblesTarget, normalization_ratio, logScaleFactor)
+      useMappingsDrawBubbles(data, width, height, margin, this.bubblesTarget, normalization_ratio, logScaleFactor, offset)
 
       this.#centerScroll(this.frameTarget)
     }

@@ -39,8 +39,11 @@ module StatisticsHelper
 
     visits_data = { visits: data.size.times.map { |x|  [] }, labels: [] }
 
+    current_month = Date.today.month
     (min_year..Date.today.year).each do |year|
       (1..12).each do |month|
+        next if month > current_month
+
         data.each_with_index do |x , i|
           old[i] += x[[year, month]]&.size || 0
         end

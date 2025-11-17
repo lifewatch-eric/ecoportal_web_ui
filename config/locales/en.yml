@@ -52,6 +52,7 @@ en:
     errors_in_fields: Errors in fields %{errors}
     add_comment: Add comment
     add_new_comment: Add a new comment
+    download_comments: Download comments
     reply: Reply
     add_proposal: Add proposal
     add_new_proposal: Add a new proposal
@@ -142,7 +143,7 @@ en:
       metadata_administration: Metadata Administration
       groups: Groups
       categories: Categories
-      persons_and_organizations: Persons & Organizations
+      persons_and_organizations: Persons & Organisations
       sparql: SPARQL
       search: Search & Indexation
       jobs: Process Scheduling
@@ -221,13 +222,13 @@ en:
     licenses:
       license_notification:
         license_contact: >
-          For more information, email <a href="mailto:support@ontoportal.org">support@ontoportal.org</a> or 
+          For more information, email <a href="mailto:support@ontoportal.org">support@ontoportal.org</a> or
           visit <a href="https://ontoportal.org/licensing" target="_blank">https://ontoportal.org/licensing</a>.
         license_obtain: >
-          If you are the owner of this OntoPortal installation, you can visit 
+          If you are the owner of this OntoPortal installation, you can visit
           <a href="https://license.ontoportal.org" target="_blank">https://license.ontoportal.org</a> to obtain a license.
         license_expired: >
-          We're sorry, but the license for this OntoPortal installation has expired. If you are the owner of this OntoPortal installation, 
+          We're sorry, but the license for this OntoPortal installation has expired. If you are the owner of this OntoPortal installation,
           please visit <a href="https://license.ontoportal.org" target="_blank">https://license.ontoportal.org</a> to renew your license.
         license_trial:
           one:
@@ -329,12 +330,13 @@ en:
     fill_text: Please fill in the proper text from the supplied image
     notice_feedback: Feedback has been sent
     account_title: Account Information
-    agroportal_figures: "%{site} in figures"
-    benefit1: Discover new insights and knowledge by exploring other semantic resources or semantic resources in the repository.
-    benefit2: Contribute to knowledge sharing and semantic interoperability in your domain.
-    benefit3: Map your semantic resource to other relevant ones in the domain and collaborate with other users.
-    benefit4: Get feedback and suggestions from other users who can use and comment on your semantic resource.
-    benefit5: Precisely describe your semantic resource with relevant metadata and get a FAIR score for your semantic resource.
+    agroportal_figures: "%{site} in numbers"
+    benefit1: Browse, search and get recommendations for semantic resources relevant to your research.
+    benefit2: Annotate text by using terms from standardised semantic resources.
+    benefit3: Programmatically access the content of semantic resources to create semantically enriched applications.
+    benefit4: Create and edit semantic resources with VocBench.
+    benefit5: Submit and share your semantic resources with the community, gaining automatic access to all available services.
+    benefit6: Retrieve and store information from semantic resources directly in your local information system.
     fair_details: See details
     fairness: FAIR Score
     get_annotations: Get annotations
@@ -343,11 +345,11 @@ en:
       tagline: The LifeWatch ERIC repository of semantic resources for ecology and related domains
       title: Welcome to %{site}
       welcome: Welcome to %{site},
-    ontology_upload: Do you want to share a semantic resource?
-    ontology_upload_benefits: 'By uploading and sharing your semantic resources to %{site}, you can:'
+    ontology_upload: Which are the benefits of using EcoPortal?
+    ontology_upload_benefits: 'By using %{site}, you can:'
     ontology_upload_button: Submit a semantic resource
     discover_ontologies_button: Discover semantic resources
-    ontology_upload_desc: Uploading a semantic resource, ontology, vocabulary, terminology, thesaurus, ... is a way of sharing your knowledge with others.
+    ontology_upload_desc: '%{site} offers access to a wide range of biodiversity-related thesauri, ontologies and glossaries.'
     paste_text_prompt: Enter a paragraph of text or some keywords...
     recommender_annotator: Recommender and Annotator
     support_and_collaborations: Support & Collaborations
@@ -416,7 +418,7 @@ en:
     number_of_ontologies_using_format: Number of semantic resources using this format
     number_of_ontologies_of_type: Number of semantic resources of this semantic resource type
     number_of_ontologies_of_formality_level: Number of semantic resources of this formality level
-    number_of_ontologies_in_catalog: Number of semantic resources in this catalog
+    number_of_ontologies_in_catalog: Number of semantic resources in this catalogue
     number_of_ontologies: Number of semantic resources
     number_of_ontologies_with_class_count_in_range: Number of semantic resources with a class count in this range
     average: Average
@@ -426,21 +428,21 @@ en:
     average_metrics: Average metrics
     category: category
     filter_network: Filter network
-    funding_endorsing_organizations: Organizations funding and endorsing the most semantic resources
+    funding_endorsing_organizations: Organisations funding and endorsing the most semantic resources
     group: group
     groups_and_categories: Groups and Categories
     intro: Visualize the panorama of all semantic resources on %{site} via metadata aggregation.
     more_properties_charts: More properties charts
     most_active_ontologies: Most active semantic resources
-    most_active_organizations: Most active organizations
+    most_active_organizations: Most active organisations
     most_active_people: Most active people
     most_active_people_as_reviewer: Most active user account
     most_mentioned_people: Most mentioned people as contact, creator, contributor or curator
     most_mentioned_people_as_reviewer: User account who published notes, reviews, and projects
     ontologies_activity_on: Semantic resource activity
     ontologies_by: Semantic resources by %{type}
-    ontologies_contributors: Contributors to semantic resource development
-    ontologies_count_by_catalog: Number of semantic resources in each semantic artefact catalog
+    ontologies_contributors:  Contributors to ontology development
+    ontologies_count_by_catalog: Number of semantic resources in each semantic artefact catalogue
     ontologies_formats: Representation language
     ontologies_languages: Natural languages
     ontologies_licenses: Licenses
@@ -448,7 +450,7 @@ en:
     ontology_fairness_evaluator: Ontology FAIRness Evaluator (O’FAIRe)
     ontology_formality_levels: Formality levels
     ontology_properties_pie_charts: Pie charts rotated to object description properties (i.e., meatdata properties used to describe semantic resource objects).
-    ontology_relations_network: semantic resource relations network
+    ontology_relations_network: Semantic resource relations network
     ontology_tools: Most used tools to build semantic resources
     owl_ontology_author_uris: Properties used to specify object author
     owl_ontology_definition_uris: Properties used to specify objects definition
@@ -549,8 +551,9 @@ en:
     create_new_mapping: Create new mapping
     all: All
     description: Dive into an overview of the mappings in the bubble view, efficiently locate a specific semantic resource in the table view or upload your own mappings.
+    intro_guide:  The Mappings allows users to link terms across semantic artefacts, showing similarities between concepts. In the Bubble View, each bubble represents an artefact - clicking one reveals connected artefacts, and selecting a pair shows term mappings. Use the three tabs (Bubble View, Table View, and Upload Mappings) to explore, browse, or add your own mappings.
     tabs:
-      bubble_view: Bubbles view
+      bubble_view: Bubble view
       table_view: Table view
       upload_mappings: Upload mappings
     types_description:
@@ -659,7 +662,7 @@ en:
     form:
       type: Type
       person: Person
-      organization: Organization
+      organization: Organisation
       name: Name
       email: Email
       acronym: Acronym
@@ -747,13 +750,13 @@ en:
       description: "Description:*"
       select_ontologies: Select Semantic resources Used
       select_administrators: Select administrators
-    
+
     edit:
       title: Editing Project %{name}
       editing_project: Editing project
       cancel: Cancel
       update_project: Update Project
-    
+
     new:
       title: Add your project
       new_project: New project
@@ -916,6 +919,8 @@ en:
     new_relationship_proposal: New Relationship Proposal
     change_property_value_proposal: Change Property Value Proposal
     new_comment_added: New comment added successfully
+    comment_archived: Comment archived successfully
+    comment_unarchived: Comment unarchived successfully
     note_deleted_successfully: Note %{note_id}  was deleted successfully
     note_not_found: Note %{note_id}  was not found in the system
     comment: Comment
@@ -939,7 +944,11 @@ en:
       save: Save
     note_line:
       alert_text: "Are you sure you want to delete the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
+      alert_archive_text: "Are you sure you want to archive the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
+      alert_unarchive_text: "Are you sure you want to unarchive the note <span style='color:red;font-weight:bold;'> ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This action CAN NOT be undone!!!</b>"
       delete: Delete
+      archive: Archive
+      unarchive: Unarchive
       archived: archived
       comment: Comment
     thread:
@@ -1015,11 +1024,11 @@ en:
     administrators: Administrators
     ontology_skos_language_link: Please refer to the documentation for more details.
     ontology_skos_language_help: >
-      SKOS vocabularies submitted to %{portal_name} shall follow a few constraints (e.g., contain a minimum of one skos:ConceptScheme also typed as owl:Ontology) 
+      SKOS vocabularies submitted to %{portal_name} shall follow a few constraints (e.g., contain a minimum of one skos:ConceptScheme also typed as owl:Ontology)
       and top concept assertion. %{link}
     ontology_obo_language_link: the OBOinOWL parser.
     ontology_obo_language_help: >
-      OBO semantic resources submitted to %{portal_name} will be parsed by the OWL-API which integrates %{link} 
+      OBO semantic resources submitted to %{portal_name} will be parsed by the OWL-API which integrates %{link}
       The resulting RDF triples will then be loaded in %{portal_name} triple-store.
     ontology_owl_language_link: the Protégé
     ontology_owl_language_help: >
@@ -1048,7 +1057,7 @@ en:
     deprecated_help: "A semantic resource with status retired shall necessarily be also deprecated, but not the opposite."
     known_usage_help: "Consider also declaring %{metadata_knownUsage_help}"
     known_usage_help_link: "the projects that are using the semantic resource"
-    help_creator: "The following properties take for value an 'agent' in %{portal_name} (either a person or an organization). These agents are shared over all the semantic resources and suggested with autocompletion if they already exist. Editing an agent here will change it to all the semantic resources that agent is involved in."
+    help_creator: "The following properties take for value an 'agent' in %{portal_name} (either a person or an organisation). These agents are shared over all the semantic resources and suggested with autocompletion if they already exist. Editing an agent here will change it to all the semantic resources that agent is involved in."
     version_help: "For more information on how to encode versioning information in a semantic resource, see %{link}"
     version_helper_link: "guidelines and recommendations."
   instances:
@@ -1249,7 +1258,7 @@ en:
       identifiers: Identifiers
       identifiers_tooltip: Principal identifiers of the semantic resource.
       dates: Dates
-      person_and_organization: Persons and organizations
+      person_and_organization: Persons and organisations
       other_links: Other links
       info_tooltip_links: Metadata properties that highlight the links enabling access to datasets, downloading semantic resources, etc
       projects_and_usage_information: Projects and usage information
@@ -1348,7 +1357,7 @@ en:
     htaccess_modal_title: "Rewrite rules for %{acronym} semantic resource"
     instructions_servers: Instructions for %{server} servers
     htaccess_redirection_description: "We offer a seamless solution to make your semantic resource URIs resolvable and content negotiable by allowing URL redirection for your semantic resource URIs to our EcoPortal URIs. To facilitate this process, we've provided you with a set of .htaccess rewrite rules. By following the simple instructions below, you'll be able to implement these rules swiftly and efficiently, ensuring smooth redirection"
-    
+
     redirection_note: |
       This redirection works only for uri with the form of:  url/path/resource_id
       This will not work for uris in the form of: url/path/to/something#resource_id OR url/path/to/something:resource_id
@@ -1360,7 +1369,7 @@ en:
       instruction_3: "Enable rewrite module (Linux):"
       instruction_3_content: "you'll need to ensure that the Apache module called 'rewrite' is enabled by running the command `sudo a2enmod rewrite`"
 
-    
+
     nginx_redirection:
       instruction_1: "Access Nginx configuration file:"
       instruction_1_content: "The location of this file can vary depending on your system, but common locations include /etc/nginx/nginx.conf, /etc/nginx/sites-available/default or /usr/local/etc/nginx/nginx.conf."
@@ -1480,7 +1489,7 @@ en:
     privacy_link: "Privacy Statement"
   taxonomy:
     groups_and_categories: Groups and Categories
-    description: "In %{portal}, ontologies are organized in groups and tagged with categories. Typically, groups associate ontologies from the same project or organization for better identification of the provenance. Whereas categories are about subjects/topics and enable to classify ontologies. As of 2016, %{portal}'s categories were established in cooperation with FAO AIMS. In 2024, we moved to UNESCO Thesaurus (https://vocabularies.unesco.org). Groups and categories, along with other metadata, can be used on the “Browse” page of %{portal} to filter out the list of ontologies."
+    description: "The categories section of %{portal} organises semantic resources into key thematic areas relevant to the ecological and other related domains. These categories were originally taken from GEMET or defined internally and integrated in 2024 to align with the top categories with the UNESCO Thesaurus, enabling a more structured and accessible browsing experience."
     show_sub_categories: Show sub categories
     no_taxonomy_created: "No %{type} are created yet"
   federation:

@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get '/notes/new_proposal', to: 'notes#new_proposal'
   get '/notes/new_reply', to: 'notes#new_reply'
   delete '/notes', to: 'notes#destroy'
+  post '/notes/archive', to: 'notes#archive'
   resources :notes, constraints: { id: /.+/ }
   get 'agents/show_search', to: 'agents#show_search'
   get 'agents/:id/usages', to: 'agents#agent_usages', constraints: { id: /.+/ }

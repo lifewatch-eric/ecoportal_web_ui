@@ -1,5 +1,6 @@
 .reply_meta
-  = add_reply_button(note.id)
+  - if not note.archived
+    = add_reply_button(note.id)
   .discussion
     .discussion_container
       = render TurboFrameComponent.new(id: "#{note.id}_new_reply")
