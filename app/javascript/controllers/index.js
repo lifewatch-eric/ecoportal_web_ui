@@ -103,3 +103,6 @@ application.register('concepts-json', ConceptsJsonButtonController)
 
 import NotesController from "./notes_controller.js"
 application.register("notes", NotesController)
+
+import GridMenuController from "./grid_menu_controller"
+application.register("grid-menu", GridMenuController)

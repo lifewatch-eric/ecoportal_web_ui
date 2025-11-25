@@ -6,7 +6,7 @@ export default class extends Controller {
 
   connect() {
     let checkbox = this.navMenuTarget
-    let divs = document.querySelectorAll('.top-nav, .top-nav-ul, .nav-items, .nav-ul-li, .nav-input, .nav-a, .nav-language, .supportMenuDropdownLink');
+    let divs = document.querySelectorAll('.top-nav, .top-nav-ul, .nav-items, .nav-ul-li, .nav-input, .nav-a, .nav-language, .supportMenuDropdownLink, .menu-container');
     checkbox.addEventListener('change', function() {
       if (this.checked) {
         divs.forEach(function(div) {
