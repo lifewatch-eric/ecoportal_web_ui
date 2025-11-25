@@ -12,7 +12,7 @@
     padding: 8px 42px;
     width: 1248px;
 }
-.nav-responsiveness-container{ 
+.nav-responsiveness-container{
     display: flex;
     justify-content: space-between;
 }
@@ -31,7 +31,7 @@
     display: flex;
     justify-content: space-between;
     align-items:center;
-    width: 1020px;    
+    width: 1020px;
 }
 .nav-items > ul {
     display: flex;
@@ -198,4 +198,158 @@
     justify-content: space-between;
     width: 50%;
     gap: 20px;
+}
+
+// LifeWatch Grid Menu Styles
+.menu-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.menu-icon {
+    padding: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 6px);
+    gap: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.menu-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon .dot {
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.menu-grid {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    min-width: 300px;
+    max-width: 380px;
+    z-index: 1000;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.menu-grid.show {
+    display: grid;
+}
+
+.menu-grid a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #333;
+    padding: 12px 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.menu-grid a:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-grid a img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    object-fit: contain;
+}
+
+.menu-grid a span {
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.3;
+}
+
+// Responsive styles for grid menu
+@media (max-width: 1300px) {
+    .menu-container {
+        margin-left: 0;
+        margin-top: 15px;
+        display: block;
+        width: 100%;
+    }
+
+    .menu-icon {
+        width: fit-content;
+    }
+
+    .menu-grid {
+        position: fixed;
+        top: auto;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+        width: auto;
+        margin-top: 8px;
+    }
+
+    .menu-container.show-responsive {
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 12px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .menu-grid a {
+        padding: 8px 4px;
+    }
+
+    .menu-grid a img {
+        width: 32px;
+        height: 32px;
+        margin-bottom: 6px;
+    }
+
+    .menu-grid a span {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .menu-grid a {
+        padding: 6px 2px;
+    }
+
+    .menu-grid a img {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 4px;
+    }
+
+    .menu-grid a span {
+        font-size: 10px;
+    }
 }
