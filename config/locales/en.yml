@@ -880,6 +880,7 @@ en:
       save_custom_semantic_resources: Save custom semantic resources
       not_subscribed: Not subscribed to any semantic resource
       submitted_semantic_resources: Submitted semantic resources
+      accessible_semantic_resources: Accessible Ontologies
       upload_semantic_resources: Upload semantic resources
       projects_created: Projects Created
       no_project_created: No project created

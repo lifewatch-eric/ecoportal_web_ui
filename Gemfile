@@ -185,3 +185,4 @@ group :test do
 end
 
 gem 'openid_connect', '~> 2.2.0'
+gem 'concurrent-ruby', '1.3.4'

@@ -25,6 +25,11 @@ module ComponentsHelper
       check_input(id: id, name: name, value: value, label: label, checked: checked, disabled: disabled, &block)
     end
   end
+  def list_items_component(max_items:, &block)
+    render ListItemsShowMoreComponent.new(max_items: max_items) do |r|
+      capture(r, &block)
+    end
+  end
 
   def group_chip_component(id: nil, name:, object:, checked:, value: nil, title: nil, disabled: false, &block)
     title ||= object["name"]

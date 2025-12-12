@@ -106,3 +106,5 @@ application.register("notes", NotesController)
 
 import GridMenuController from "./grid_menu_controller"
 application.register("grid-menu", GridMenuController)
+import ParentCategoriesSelectorController from "./parent_categories_selector_controller.js"
+application.register('parent-categories-selector', ParentCategoriesSelectorController)

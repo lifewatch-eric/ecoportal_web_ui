@@ -98,41 +98,66 @@ $SITE_NOTICE = {}
 # Full string for site, EX: "NCBO BioPortal"
 $ORG_SITE = $ORG.nil? || $ORG.empty? ? $SITE : "#{$ORG} #{$SITE}"
 
-$HOME_PAGE_LOGOS = [
+$PORTALS_INSTANCES = [
   {
-    img_src: 'logos/supports/numev.png',
-    url: 'http://www.lirmm.fr/numev',
-    target: '_blank'
+    name: 'AgroPortal',
+    ui: 'https://agroportal.lirmm.fr/',
+    color: '#3CB371',
+    api: 'https://data.agroportal.lirmm.fr/',
+    apikey: '1de0a270-29c5-4dda-b043-7c3580628cd5',
+    'light-color': '#F1F6FA'
   },
   {
-    img_src: 'logos/supports/anr.png',
-    url: 'https://anr.fr/en',
-    target: '_blank'
+    name: 'BioPortal',
+    ui: 'https://bioportal.bioontology.org/',
+    color: '#234979'
   },
   {
-    img_src: 'logos/supports/eu.png',
-    url: 'https://commission.europa.eu/research-and-innovation_en',
-    target: '_blank'
+    name: 'SIFR BioPortal',
+    apikey: '1de0a270-29c5-4dda-b043-7c3580628cd5',
+    color: '#74a9cb'
   },
   {
-    img_src: 'logos/collaboration/d2kab.png',
-    url: 'http://d2kab.mystrikingly.com',
-    target: '_blank'
+    name: 'EcoPortal',
+    ui: 'https://ecoportal.lifewatch.eu/',
+    color: '#0F4E8A',
+    api: 'https://data.ecoportal.lifewatch.eu/',
+    apikey: "43a437ba-a437-4bf0-affd-ab520e584719",
+    'light-color': '#E9F2FA'
   },
   {
-    img_src: 'logos/collaboration/lirmm.png',
-    url: 'http://www.lirmm.fr',
-    target: '_blank'
+    name: 'MedPortal',
+    ui: 'http://medportal.bmicc.cn/',
+    color: '#234979',
   },
   {
-    img_src: 'logos/collaboration/inrae.png',
-    url: 'https://www.inrae.fr/enm',
-    target: '_blank'
+    name: 'MatPortal',
+    ui: 'https://matportal.org/',
+    color: '#009574',
   },
   {
-    img_src: 'logos/collaboration/stanford.png',
-    url: 'https://www.stanford.edu',
-    target: '_blank'
+    name: 'IndustryPortal',
+    ui: 'http://industryportal.enit.fr',
+    api: 'data.industryportale.test.enit.fr',
+    apikey: '019adb70-1d64-41b7-8f6e-8f7e5eb54942',
+    color: '#1c0f5d'
+  },
+  {
+    name: 'EarthPortal',
+    ui: 'https://earthportal.eu/',
+    color: '#404696',
+    api: 'https://data.earthportal.eu/',
+    apikey: "c9147279-954f-41bd-b068-da9b0c441288",
+    'light-color': '#F0F5F6'
+  },
+  {
+    name: 'BiodivPortal',
+    ui: 'https://biodivportal.gfbio.org/',
+    color: '#349696',
+    api: 'https://data.biodivportal.gfbio.org/',
+    apikey: "47a57aa3-7b54-4f34-b695-dbb5f5b7363e",
+    'light-color': '#EBF5F5',
+
   }
 ]
 
