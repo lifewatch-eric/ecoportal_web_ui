@@ -1,5 +1,6 @@
 class NotesController < ApplicationController
   include TurboHelper
+  include ReplyNotificationMailer
   layout 'ontology'
 
   NOTES_PROPOSAL_TYPES = {
@@ -74,6 +75,12 @@ class NotesController < ApplicationController
     if params[:type].eql?("reply")
       note = LinkedData::Client::Models::Reply.new(values: note_params)
       new_note = note.save
+      # get parent note
+      parent_note = LinkedData::Client::Models::Note.find(params[:parent])
+      # get creator
+      creator_id = parent_note.creator
+      creator_email= LinkedData::Client::Models::User.find(creator_id).email
+      NoteMailer.reply_to_comment(new_note, creator_email)
       success_message = ''
       locals =  { note: new_note, parent_id: params[:parent]}
       partial = 'notes/reply/reply'
