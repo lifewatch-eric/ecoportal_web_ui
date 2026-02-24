@@ -31,6 +31,8 @@ module DoiRequest
     }
     @identifier_req_obj = LinkedData::Client::Models::IdentifierRequest.new(values: request_id_hash)
     @identifier_req_obj.save
+
+    DoiRequestMailer.new_doi_request(@ontology, submission_id, session[:user].username).deliver_later rescue nil
   end
 
 end
