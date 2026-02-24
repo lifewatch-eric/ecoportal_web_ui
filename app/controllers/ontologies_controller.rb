@@ -24,9 +24,11 @@ class OntologiesController < ApplicationController
 
   layout 'ontology'
 
-  before_action :authorize_and_redirect, :only => [:edit, :update, :create, :new]
+  before_action :authorize_and_redirect, :only => [:create, :new]
   before_action :submission_metadata, only: [:show]
   before_action :set_federated_portals, only: [:index, :ontologies_filter]
+  before_action :authorize_read_only, :only => [:new, :create, :edit, :update, :destroy]
+  before_action :authorize_ontology_admin, only: [:edit]
 
   KNOWN_PAGES = Set.new(["terms", "classes", "mappings", "notes", "widgets", "summary", "properties", "instances", "schemes", "collections", "sparql"])
   EXTERNAL_MAPPINGS_GRAPH = "http://data.bioontology.org/metadata/ExternalMappings"
@@ -38,7 +40,6 @@ class OntologiesController < ApplicationController
     @groups = LinkedData::Client::Models::Group.all(display_links: false, display_context: false)
 
     @filters = ontology_filters_init(@categories, @groups)
-    init_filters(params)
     render 'ontologies/browser/browse'
   end
 
@@ -145,9 +146,6 @@ class OntologiesController < ApplicationController
   end
 
   def edit
-    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:id]).first
-    redirect_to_home unless session[:user] && @ontology.administeredBy.include?(session[:user].id) || session[:user].admin?
-
     submission = @ontology.explore.latest_submission(include: 'submissionId')
     if submission
       redirect_to edit_ontology_submission_path(@ontology.acronym, submission.submissionId)
@@ -359,7 +357,7 @@ class OntologiesController < ApplicationController
 
     @config_properties = properties_hash_values(category_attributes["object description properties"])
     @methodology_properties = properties_hash_values(category_attributes["methodology"])
-    @agents_properties = properties_hash_values(category_attributes["persons and organizations"])
+    @agents_properties = properties_hash_values(category_attributes['agents'])
     @dates_properties = properties_hash_values(category_attributes["dates"])
     @links_properties = properties_hash_values([:isFormatOf, :hasFormat, :source, :includedInDataCatalog])
     @content_properties = properties_hash_values(category_attributes["content"])
@@ -437,14 +435,18 @@ class OntologiesController < ApplicationController
 
   def metrics
     @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology_id]).first
-    @metrics = @ontology.explore.metrics(display_context: false, display_links: false)
-    render partial: 'ontologies/sections/metrics'
+    if @ontology.nil? || @ontology.errors
+      ontology_not_found(params[:ontology])
+    else
+      @metrics = @ontology.explore.metrics(display_context: false, display_links: false)
+      render partial: 'ontologies/sections/metrics'
+    end
   end
 
   def metrics_evolution
     @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology_id]).first
     key = params[:metrics_key]
-    ontology_not_found(params[:ontology_id]) if @ontology.nil?
+    ontology_not_found(params[:ontology_id]) if @ontology.nil? || @ontology.errors
 
     # Retrieve submissions in descending submissionId order (should be reverse chronological order)
     @submissions = @ontology.explore.submissions({ include: "metrics" })
@@ -510,6 +512,13 @@ class OntologiesController < ApplicationController
     end
     render 'ontologies/ontologies_selector/ontologies_selector_results'
   end
+
+  # app/controllers/ontologies_controller.rb
+  def subject_chips
+    @subjects = Array(params[:subjects])
+    render  partial: 'ontologies/sections/metadata/subject_chips', layout: false
+  end
+
 
   private
 
@@ -593,7 +602,13 @@ class OntologiesController < ApplicationController
 
   def keep_only_root_categories(categories)
     categories.select do |category|
+      next unless category.id
       category.id.start_with?(rest_url) || category.parentCategory.blank?
     end
+  end
+
+  def authorize_ontology_admin
+    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:id]).first
+    redirect_to_home unless session[:user] && (@ontology.administeredBy.include?(session[:user].id) || session[:user].admin?)
   end
 end

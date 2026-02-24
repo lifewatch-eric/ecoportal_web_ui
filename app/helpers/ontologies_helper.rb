@@ -1,6 +1,5 @@
 require 'iso-639'
 module OntologiesHelper
-
   REST_URI = $REST_URL
   API_KEY = $API_KEY
   LANGUAGE_FILTERABLE_SECTIONS = %w[classes schemes collections instances properties].freeze
@@ -82,8 +81,8 @@ module OntologiesHelper
     end
   end
 
-  def ontologies_with_filters_url(filters, page: 1, count: false)
-    url = '/ontologies_filter?'
+  def ontologies_with_filters_url(filters, page: 1, count: false, user: false)
+    url = user ? "/user_ontologies_filter?" : '/ontologies_filter?'
     url += "page=#{page}" if page
     url += "count=#{page}" if count
     if filters
@@ -317,24 +316,47 @@ module OntologiesHelper
     "<a href='#{ont_url}/?p=#{page_name}'>#{link_name}</a>"
   end
 
-  def category_name_chip_component(domain)
-    text = domain.split('/').last.titleize
-
-
-    return render(ChipButtonComponent.new(text: text, tooltip: domain,  type: "static")) unless link?(domain)
-
-
-    acronym = domain.split('/').last.upcase.strip
-    category = LinkedData::Client::Models::Category.find(acronym)
-
-    if category.name
-      render ChipButtonComponent.new(text: text, tooltip: category.name,  type: "static")
-    else
-      render ChipButtonComponent.new(text: text, tooltip: domain,  url: domain, type: "clickable", target: '_blank')
+  def category_chip(domain)
+    acronym = domain.split('/').last.strip
+    begin
+      category = LinkedData::Client::Models::Category.find(acronym)
+      return if category.nil? || category.status == 404
+    
+      render ChipButtonComponent.new(
+        text: acronym.upcase,
+        tooltip: category.name, 
+        type: "clickable",
+        url: categories_browse_url(category.acronym),
+        target: "_blank"
+      )
+    rescue => e
+      Rails.logger.warn("Failed to fetch category for '#{acronym}': #{e.message}")
+      nil
     end
-
   end
 
+  def subject_chip(subject, theme_taxonomy_ontologies)
+    resolved = resolve_subject_uri(subject, theme_taxonomy_ontologies)
+    return unless resolved
+
+    render ChipButtonComponent.new(
+      text: resolved[:text].titleize,
+      tooltip: subject,
+      url: resolved[:url],
+      type: "clickable",
+      target: "_blank"
+    )
+  rescue => e
+    Rails.logger.warn("Failed to fetch prefLabel from ontology for '#{subject}': #{e.message}")
+    nil
+  end
+
+  def keyword_chip(keyword)
+    render ChipButtonComponent.new(
+      text: keyword.downcase,
+      type: "static"
+    )
+  end
 
   def show_ontology_domains(domains)
     if domains.length == 1 && domains[0].include?(',')
@@ -410,6 +432,10 @@ module OntologiesHelper
     ontology_data_sections.include?(section_title)
   end
 
+  def lazy_load_section?(section_title)
+    !(ontology_data_section?(section_title) || section_title.eql?('summary'))
+  end
+
   def section_data(section_title)
     if ontology_data_section?(section_title)
       url_value = selected_section?(section_title) ? request.fullpath : "/ontologies/#{@ontology.acronym}?p=#{section_title}"
@@ -419,12 +445,13 @@ module OntologiesHelper
     end
   end
 
-  def lazy_load_section(section_title, &block)
+  def lazy_load_section(section_title, lazy_load: true, &block)
     if current_section.eql?(section_title)
       block.call
     else
       render TurboFrameComponent.new(id: section_title, src: "/ontologies/#{@ontology.acronym}?p=#{section_title}",
-                                     loading: Rails.env.development? ? "lazy" : "eager",
+
+                                     loading: Rails.env.development? || lazy_load ? "lazy" : "eager",
                                      target: '_top', data: { "turbo-frame-target": "frame" })
     end
   end
@@ -460,7 +487,8 @@ module OntologiesHelper
       sections += %w[properties]
       sections += %w[schemes collections] if skos?
       sections += %w[instances] unless skos?
-      sections += %w[notes mappings widgets sparql]
+      sections += %w[notes mappings widgets]
+      sections << 'sparql' if sparql_enabled?
     end
     sections
   end
@@ -655,6 +683,12 @@ module OntologiesHelper
                                       size: 'medium', title: t('ontologies.add_new_submission'))
   end
 
+  def ontology_admin_button
+    return unless @ontology.admin?(session[:user])
+    render RoundedButtonComponent.new(link: ontology_administration_path(@ontology.acronym), icon: 'icons/settings.svg',
+                                      size: 'medium', title: t('ontologies.admin.title'))
+  end
+
   def ontology_edit_button
     return unless @ontology.admin?(session[:user])
     render RoundedButtonComponent.new(link: edit_ontology_submission_path(ontology_id: @ontology.acronym, id: @submission_latest.id.split('/').last), icon: 'edit.svg',
@@ -663,23 +697,31 @@ module OntologiesHelper
   end
 
   def upload_ontology_button
-    if session[:user].nil?
-      render Buttons::RegularButtonComponent.new(id: "upload-ontology-button", value: t('home.ontology_upload_button'), variant: "secondary", state: "regular", href: "/login?redirect=/ontologies/new") do |btn|
-        btn.icon_left do
-          inline_svg_tag "upload.svg"
-        end
-      end
-    else
-      render Buttons::RegularButtonComponent.new(id: "upload-ontology-button", value: t('home.ontology_upload_button'), variant: "secondary", state: "regular", href: new_ontology_path) do |btn|
+    return if read_only_enabled?
+
+    href = if session[:user].nil?
+             "/login?redirect=#{new_ontology_path}"
+           else
+             new_ontology_path
+           end
+
+    render = regular_button(
+      "upload-ontology-button",
+      t('home.ontology_upload_button'),
+      variant: "secondary",
+      state: "regular",
+      size: nil,
+      href: href) do |btn|
         btn.icon_left do
           inline_svg_tag "upload.svg"
         end
       end
     end
-  end
 
   def submission_json_button
-    render RoundedButtonComponent.new(link: "#{(@submission_latest || @ontology).id}?display=all",
+    link = "#{(@submission_latest || @ontology).id}?display=all"
+    link += "&apikey=#{get_apikey}" unless session[:user].nil?
+    render RoundedButtonComponent.new(link: link,
                                       target: '_blank',
                                       size: 'medium',
                                       title: t('ontologies.go_to_api'))
@@ -816,15 +858,11 @@ module OntologiesHelper
     Array(submission&.naturalLanguage).map { |natural_language| natural_language["iso639"] && natural_language.split('/').last }.compact
   end
 
-  def id_to_acronym(id)
-    id.split('/').last
-  end
-
   def browse_taxonomy_tooltip(taxonomy_type)
     return nil unless taxonomy_type.eql?("categories") || taxonomy_type.eql?("groups")
 
     content_tag(:div, class: '') do
-      content_tag(:span, "See more information about #{taxonomy_type} in ", class: 'mr-1') +
+      content_tag(:span, t('ontologies.taxonomy_information_tooltip', taxonomy_type: taxonomy_type), class: 'mr-1') +
         content_tag(:a, 'here', href: "/#{taxonomy_type}", target: '_blank')
     end
   end
@@ -832,9 +870,10 @@ module OntologiesHelper
   def browse_chip_filter(key:, object:, values:, countable: true, count: nil)
     title = (key.to_s.eql?("categories") || key.to_s.eql?("groups")) ? nil : ''
     checked = values.any? { |obj| [link_last_part(object["id"]), link_last_part(object["value"])].include?(obj) }
-
-    group_chip_component(name: key, object: object, checked: checked, title: title) do |c|
-      c.count { browse_chip_count_badge(key: key, id: object["id"], count: count) } if countable
+    content_tag(:div, (key.to_s.eql?("categories") ? { 'data-action' => 'click->parent-categories-selector#check' } : {})) do
+      group_chip_component(name: key, object: object, checked: checked, title: title) do |c|
+        c.count { browse_chip_count_badge(key: key, id: object["id"], count: count) } if countable
+      end
     end
   end
 

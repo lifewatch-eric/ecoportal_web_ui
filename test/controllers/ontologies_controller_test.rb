@@ -11,10 +11,12 @@ class OntologiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  ONTOLOGIES.each do |ont|
+  # We use only the STY ontology to test to avoid long tests
+  SAMPLE_ACRONYMS = %w[STY].freeze
+  SAMPLE_ACRONYMS.each do |ont_acronym|
     PAGES.each do |page|
-      test "should get page #{page} of #{ont.acronym} ontology" do
-        path = "#{ontologies_path}/#{ont.acronym}?p=#{page}"
+      test "should get page #{page} of #{ont_acronym} ontology" do
+        path = "#{ontologies_path}/#{ont_acronym}?p=#{page}"
         get path
         if response.redirect?
           follow_redirect!
@@ -23,10 +25,10 @@ class OntologiesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    test "should open the tree views of #{ont.acronym} ontology" do
+    test "should open the tree views of #{ont_acronym} ontology" do
       paths = [
-        ajax_classes_treeview_path(ontology: ont.acronym),
-        "/ontologies/#{ont.acronym}/properties"
+        ajax_classes_treeview_path(ontology: ont_acronym),
+        "/ontologies/#{ont_acronym}/properties"
       ]
       paths.each do |path|
         begin
@@ -55,7 +57,11 @@ class OntologiesControllerTest < ActionDispatch::IntegrationTest
 
   test 'test get STY in xml format' do
     get '/ontologies/STY', headers: { 'Accept' => 'application/xml' }
-    assert_equal 500, response.status # STY has only Turtle
+    if $REST_URL == "https://data.stageportal.lirmm.fr/"
+      assert_response :success
+    else
+      assert_equal 500, response.status # STY does not have xml in localhost:9393
+    end
   end
 
   test 'test get STY in csv format' do

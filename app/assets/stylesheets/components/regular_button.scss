@@ -1,5 +1,7 @@
 .regular-button {
-    width: 100%;
+    min-width: 100%;
+    width: auto;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;

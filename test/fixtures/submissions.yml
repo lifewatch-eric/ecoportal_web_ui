@@ -45,7 +45,7 @@ submission1:
     {name: 'contact1' , email: "contact1@test.com"},
     {name: 'contact2' , email: "contact2@test.com"},
   ]
-  pullLocation: 'https://raw.githubusercontent.com/owlcs/pizza-ontology/master/pizza.owl'
+  pullLocation: 'https://www.w3.org/2009/08/skos-reference/skos.rdf'
 
 submission2:
   URI: "http://example.org/ontologies/ontology2"

@@ -17,13 +17,15 @@ Rails.application.routes.draw do
   delete '/notes', to: 'notes#destroy'
   post '/notes/archive', to: 'notes#archive'
   resources :notes, constraints: { id: /.+/ }
+
+  # Agents
+  get 'agents/:id', to: 'agents#details',  constraints: { id: /[0-9a-f\-]+/ }
+  get 'agents/:id/show', to: 'agents#show',  constraints: { id: /[0-9]+/ }
   get 'agents/show_search', to: 'agents#show_search'
   get 'agents/:id/usages', to: 'agents#agent_usages', constraints: { id: /.+/ }
   post 'agents/:id/usages', to: 'agents#update_agent_usages', constraints: { id: /.+/ }
   resources :agents, constraints: { id: /.+/ }
   post 'agents/:id', to: 'agents#update', constraints: { id: /.+/ }
-
-
 
   resources :projects, constraints: { id: /[^\/]+/ }
 
@@ -61,10 +63,22 @@ Rails.application.routes.draw do
 
     get ':ontology/collections', to: 'collections#index'
     get ':ontology/collections/show', to: 'collections#show'
+    get 'subject_chips', to: "ontologies#subject_chips"
   end
 
+  # user ontologies
+  resources :my_ontologies, only: [:index, :new]
+  get '/user_ontologies_filter', to: 'my_ontologies#user_ontologies_filter'
 
   resources :ontologies do
+    # TODO: reenable in the next releases
+    # resource :administration, controller: 'ontologies_administration', only: [:show, :destroy] do
+    #   get 'log'
+    #   get 'submissions'
+    #   delete 'submissions', action: :destroy_submission
+    #   delete 'submissions/:id', action: :destroy_submission
+    # end
+
     resources :submissions do
       get 'edit_properties'
     end
@@ -93,6 +107,9 @@ Rails.application.routes.draw do
     match 'groups/synchronize_groups' => 'groups#synchronize_groups', via: [:post]
     resources :groups, only: [:index, :create, :new, :edit, :update, :destroy]
     resources :categories, only: [:index, :create, :new, :edit, :update, :destroy]
+    resources :agents, only: [:index]
+    resource :catalog_configuration, only: [:show, :update], controller: 'catalog_configuration'
+    get 'catalog_configuration/edit_nested_form/:key', to: 'catalog_configuration#edit_nested_form', as: 'edit_nested_form_catalog_configuration'
     scope :search do
       get '/', to: 'search#index'
       post 'index_batch', to: 'search#index_batch'
@@ -104,12 +121,17 @@ Rails.application.routes.draw do
     get 'doi_requests/:ontology_id', to: 'doi_request#show'
     post 'doi_requests/:ontology_id/create', to: 'doi_request#create'
     post 'doi_requests/:ontology_id/cancel', to: 'doi_request#update'
+    resources :analytics, only: [:index]
+    constraints lambda { |request| request.session[:user]&.admin? } do
+      mount Flipper::UI.app(Flipper) => '/flipper', as: :flipper
+    end
   end
 
   post 'admin/clearcache', to: 'admin#clearcache'
   post 'admin/resetcache', to: 'admin#resetcache'
   post 'admin/clear_goo_cache', to: 'admin#clear_goo_cache'
   post 'admin/clear_http_cache', to: 'admin#clear_http_cache'
+  get 'metadata_administration', to: 'admin#metadata_administration'
   get 'admin/ontologies_report', to: 'admin#ontologies_report'
   post 'admin/refresh_ontologies_report', to: 'admin#refresh_ontologies_report'
   delete 'admin/ontologies', to: 'admin#delete_ontologies'
@@ -145,9 +167,16 @@ Rails.application.routes.draw do
   end
 
   get '' => 'home#index'
+  get 'home/metrics', to: 'home#metrics'
+  get 'home/agents', to: 'home#agents'
   get 'status/:portal_name', to: 'home#federation_portals_status'
-
+  
+  # SPARQL 
   match 'sparql_proxy', to: 'admin#sparql_endpoint', via: [:get, :post]
+  get 'sparql', to: 'sparql_endpoint#index', as: 'sparql_endpoint'
+  get 'sparql/edit_sample_queries', to: 'sparql_endpoint#edit_sample_queries', as: 'edit_sample_queries'
+
+
 
   # Top-level pages
   match '/feedback', to: 'home#feedback', via: [:get, :post]
@@ -216,6 +245,7 @@ Rails.application.routes.draw do
   get '/ajax/fair_score/json' => 'fair_score#details_json'
   get '/ajax/ontologies', to: 'ontologies#ajax_ontologies'
   get '/ajax/agents', to: 'agents#ajax_agents'
+  get '/ajax/agents/list', to: 'agents#ajax_agents_list'
   get '/ajax/images/show' => 'application#show_image_modal'
 
   # User

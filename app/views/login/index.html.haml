@@ -13,6 +13,7 @@
         %hr#register-title-line/
       %div
     = form_for(:user, :url => {:controller => 'login',:action=>'create'}) do |f|
+      = hidden_field_tag :redirect, @redirect_url
       %p.login-input-title= t('login.username_or_email')
       = text_field 'user', 'username', class: "login-input email-input", placeholder: t('login.enter_email')
       %p.login-input-title= t('login.password')

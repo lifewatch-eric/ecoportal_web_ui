@@ -45,7 +45,7 @@ class LoginFlowsTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to ontologies_url
+    assert_redirected_to "/my-ontologies"
     follow_redirect!
 
     assert_select '.notification', text: 'Account was successfully created'
@@ -67,10 +67,10 @@ class LoginFlowsTest < ActionDispatch::IntegrationTest
     assert_select '.title', text: 'Username:'
     assert_select '.info', text: new_user.username
 
-    assert_select '.title', text: 'ORCID ID:'
+    assert_select '.title', text: 'ORCID:'
     assert_select '.info', text: new_user.orcidId
 
-    assert_select '.title', text: 'GitHub ID:'
+    assert_select '.title', text: 'GitHub account:'
     assert_select '.info', text: new_user.githubId
   end
 

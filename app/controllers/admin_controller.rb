@@ -1,26 +1,12 @@
 class AdminController < ApplicationController
-  include TurboHelper, HomeHelper, SparqlHelper
+  include TurboHelper, HomeHelper, SparqlHelper, AdminHelper
   layout :determine_layout
-  before_action :cache_setup, :check_admin?
-  skip_before_action :cache_setup, :check_admin?, only: [:sparql_endpoint]
+  before_action :authorize_admin
+  before_action :cache_setup
 
-
-  ADMIN_URL = "#{LinkedData::Client.settings.rest_url}/admin/"
-  ONTOLOGIES_URL = "#{ADMIN_URL}ontologies_report"
-  USERS_URL = "#{LinkedData::Client.settings.rest_url}/users"
+    USERS_URL = "#{LinkedData::Client.settings.rest_url}/users"
   ONTOLOGY_URL = lambda { |acronym| "#{ADMIN_URL}ontologies/#{acronym}" }
   PARSE_LOG_URL = lambda { |acronym| "#{ONTOLOGY_URL.call(acronym)}/log" }
-  REPORT_NEVER_GENERATED = "NEVER GENERATED"
-  ONTOLOGIES_LIST_URL = "#{LinkedData::Client.settings.rest_url}/ontologies/"
-
-  include DoiRequestAdministration
-
-  def jobs
-    json = LinkedData::Client::HTTP.get("#{ADMIN_URL}scheduled_jobs", raw: true)
-    @scheduledJobs = JSON.parse(json, :symbolize_names => true)
-
-    render 'jobs', layout: nil
-  end
 
   def sparql_endpoint
     graph = params["named-graph-uri"]
@@ -46,13 +32,11 @@ class AdminController < ApplicationController
   end
 
   def index
-    @users = LinkedData::Client::Models::User.all
-    @ontology_visits = ontology_visits_data
-    @users_visits = user_visits_data
-    @page_visits = page_visits_data
-    @ontologies_problems_count = _ontologies_report[:ontologies]&.select{|a,v| v[:problem]}&.size || 0
   end
 
+  def metadata_administration
+    render 'metadata_administration'
+  end
 
   def update_check_enabled
     enabled = LinkedData::Client::HTTP.get("#{ADMIN_URL}update_check_enabled", {}, raw: false)
@@ -99,7 +83,7 @@ class AdminController < ApplicationController
   def parse_log
     @acronym = params["acronym"]
     @parse_log = LinkedData::Client::HTTP.get(PARSE_LOG_URL.call(params["acronym"]), {}, raw: false)
-    ontologies_report = _ontologies_report
+    ontologies_report = helpers.get_ontologies_report
     ontology = ontologies_report[:ontologies][params["acronym"].to_sym]
     @log_file_path = ''
 
@@ -208,7 +192,7 @@ class AdminController < ApplicationController
   end
 
   def ontologies_report
-    response = _ontologies_report
+    response = helpers.get_ontologies_report
     render :json => response
   end
 
@@ -320,27 +304,6 @@ class AdminController < ApplicationController
 
   def cache_setup
     @cache = Rails.cache.instance_variable_get("@data")
-  end
-
-  def _ontologies_report
-    response = {ontologies: Hash.new, report_date_generated: REPORT_NEVER_GENERATED, errors: '', success: ''}
-    start = Time.now
-
-    begin
-      ontologies_data = LinkedData::Client::HTTP.get(ONTOLOGIES_URL, {}, raw: true)
-      ontologies_data_parsed = JSON.parse(ontologies_data, :symbolize_names => true)
-
-      if ontologies_data_parsed[:errors]
-        _process_errors(ontologies_data_parsed[:errors], response, true)
-      else
-        response.merge!(ontologies_data_parsed)
-        response[:success] = t('admin.report_successfully_regenerated', report_date_generated: ontologies_data_parsed[:report_date_generated])
-        LOG.add :debug, t('admin.ontologies_report_retrieved', ontologies: response[:ontologies].length, time: Time.now - start)
-      end
-    rescue Exception => e
-      response[:errors] = t('admin.problem_retrieving_ontologies', message: e.message)
-    end
-    response
   end
 
   def _process_errors(errors, response, remove_trailing_comma=true)

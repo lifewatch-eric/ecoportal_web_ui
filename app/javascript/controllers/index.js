@@ -94,6 +94,8 @@ application.register('form-url', FormUrlController)
 import OntologiesSelector from "./ontologies_selector_controller"
 application.register("ontologies-selector", OntologiesSelector)
 
+import ChartController from "./agents_statistics_chart"
+application.register('agents-statistics', ChartController)
 
 import MappingsController from "./mappings_visualization_controller"
 application.register('mappings', MappingsController)
@@ -106,3 +108,10 @@ application.register("notes", NotesController)
 
 import GridMenuController from "./grid_menu_controller"
 application.register("grid-menu", GridMenuController)
+
+import ParentCategoriesSelectorController from "./parent_categories_selector_controller.js"
+application.register('parent-categories-selector', ParentCategoriesSelectorController)
+
+
+import SubjectsController from "./subjects_controller.js"
+application.register("subjects", SubjectsController)

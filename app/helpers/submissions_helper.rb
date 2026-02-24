@@ -181,7 +181,7 @@ module SubmissionsHelper
 
   def equivalent_properties(attr_labels)
     labels = Array(attr_labels)
-    labels.map { |x| equivalent_property(x) }.flatten
+    labels.map { |x| equivalent_property(x) }.compact.flatten
   end
 
   def submission_properties
@@ -194,9 +194,21 @@ module SubmissionsHelper
 
     out
   end
+  
+  def equivalent_ontology_property(attr)
+    equivalents = ontology_properties
+    found = equivalents.select { |x| x.is_a?(Array) ? x[1].eql?(attr.to_sym) : x.eql?(attr)}
+    
+    found.empty? ? nil : found.first.is_a?(Array) ? found.first[1] : found.first
+  end
+
+  def equivalent_ontology_properties(attr_labels)
+    labels = Array(attr_labels)
+    labels.map { |x| equivalent_ontology_property(x) }.compact.flatten
+  end
+
   def ontology_properties
-    ['acronym', 'name', [t('submission_inputs.visibility'), :viewingRestriction], 'viewOf', 'groups', 'categories',
-     [t('submission_inputs.administrators'), 'administeredBy']]
+    ['acronym', 'name', [t('submission_inputs.visibility'), :viewingRestriction], 'viewOf', ['Groups', :group], ['Categories', :hasDomain], [t('submission_inputs.administrators'), :administeredBy], ['Sample Queries', :sampleQueries]]
   end
 
   def submission_editable_properties
@@ -244,10 +256,6 @@ module SubmissionsHelper
       output += has_ontology_language_input
     end
 
-    if selected_attribute?('categories')
-      output += ontology_categories_input
-    end
-
     if selected_attribute?('groups')
       output += ontology_groups_input
     end
@@ -282,7 +290,7 @@ module SubmissionsHelper
       end
     end
 
-    reject_metadata = %w[abstract description uploadFilePath contact pullLocation hasOntologyLanguage hasLicense bugDatabase knownUsage version notes deprecated status]
+    reject_metadata = %w[keywords hasDomain abstract description uploadFilePath contact pullLocation hasOntologyLanguage hasLicense bugDatabase knownUsage version notes deprecated status sampleQueries]
     label = inline_save? ? '' : nil
 
     if selected_attribute?('abstract')
@@ -339,12 +347,31 @@ module SubmissionsHelper
       end
     end
 
+    if selected_attribute?('categories')
+      output += ontology_categories_input
+    end
+
+    if selected_attribute?('hasDomain')
+      output += ontology_submission_subjects_input
+    end
+
+    if selected_attribute?('keywords')
+      output += attribute_form_group_container('keywords') do
+        raw attribute_input('keywords', label: label)
+      end
+    end
+
     submission_metadata.reject { |attr| reject_metadata.include?(attr['attribute']) || !selected_attribute?(attr['attribute']) }.each do |attr|
       output += attribute_form_group_container(attr['attribute']) do
         raw attribute_input(attr['attribute'], label: label)
       end
     end
 
+    if selected_attribute?('sampleQueries')
+      output += render Input::InputFieldComponent.new(name: "config[sampleQueries]", label: "Sample Queries", error_message: attribute_error("sampleQueries")) do
+        render SampleQueriesEditComponent.new(graph: @submission.id)
+      end  
+    end
     render TurboFrameComponent.new(id: frame_id) do
       output.html_safe
     end

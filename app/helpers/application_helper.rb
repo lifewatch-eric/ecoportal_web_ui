@@ -30,6 +30,20 @@ module ApplicationHelper
     render IconWithTooltipComponent.new(icon: "json.svg",link: link, target: '_blank', title: t('fair_score.go_to_api'), size:'small', style: custom_style)
   end
 
+  def read_only_enabled?
+    $READ_ONLY_PORTAL && !current_user_admin?
+  end
+  
+  def agents_enabled?
+    user = current_user rescue nil
+    Flipper.enabled?('Agents', user)
+  end
+
+  def sparql_enabled?
+    user = current_user rescue nil
+    Flipper.enabled?('SPARQL', user) && $SPARQL_ENDPOINT_URL
+  end
+
   def portal_name_from_uri(uri)
     URI.parse(uri).hostname.split('.').first
   end
@@ -68,6 +82,8 @@ module ApplicationHelper
   end
 
   def current_user
+    # Safely return session[:user] or nil if no session context
+    return nil unless respond_to?(:session) && session
     session[:user]
   end
 
@@ -367,6 +383,10 @@ module ApplicationHelper
     # Reconstruct the cleaned URL
     "#{protocol}://#{cleaned_path}"
   end
+  
+  def categories_browse_url(category)
+    ontologies_path(categories: category)
+  end
 
   def prefix_property_url(key_string, key = nil)
     namespace_key, _ = RESOLVE_NAMESPACE.find { |_, value| key_string.include?(value) }
@@ -408,19 +428,16 @@ module ApplicationHelper
     end
   end
 
-  def empty_state(text = t('no_result_was_found'))
-    content_tag(:div, class:'browse-empty-illustration') do
-      inline_svg_tag('empty-box.svg') +
-      content_tag(:p, text)
-    end
+  def empty_state(text: t('no_result_was_found'))
+    render Display::EmptyStateComponent.new(text: text)
   end
 
-  def ontologies_selector(id:, label: nil, name: nil, selected: nil, placeholder: nil, multiple: true, ontologies: onts_for_select)
+  def ontologies_selector(id:, label: nil, name: nil, selected: nil, placeholder: nil, multiple: true, ontologies: onts_for_select, show_advanced_options: true)
     content_tag(:div) do
       render(Input::SelectComponent.new(id: id, label: label, name: name, value: ontologies, multiple: multiple, selected: selected, placeholder: placeholder)) +
-      content_tag(:div, class: 'ontologies-selector-button', 'data-controller': 'ontologies-selector', 'data-ontologies-selector-id-value': id) do
+      content_tag(:div, class: 'ontologies-selector-button', 'data-controller': 'ontologies-selector', 'data-ontologies-selector-id-value': id) do      
         content_tag(:div, t('ontologies_selector.clear_selection'), class: 'clear-selection', 'data-action': 'click->ontologies-selector#clear') +
-        link_to_modal(t('ontologies_selector.ontologies_advanced_selection'), "/ontologies_selector?id=#{id}", data: { show_modal_title_value: t('ontologies_selector.ontologies_advanced_selection')})
+        (show_advanced_options ? link_to_modal(t('ontologies_selector.ontologies_advanced_selection'), "/ontologies_selector?id=#{id}", data: { show_modal_title_value: t('ontologies_selector.ontologies_advanced_selection') }) : ''.html_safe)
       end
     end
   end
@@ -455,12 +472,42 @@ module ApplicationHelper
   end
 
   def category_is_parent?(parents_list, category)
+    # Handle nil or empty parents_list
+    return [false, ''] unless parents_list.respond_to?(:keys)
+
     is_parent = parents_list.keys.include?(category.id)
     parent_error_message = t('admin.categories.category_used_parent')
     parents_list[category.id].each do |c|
       parent_error_message = "#{parent_error_message} #{c}"
     end
     [is_parent,parent_error_message]
+  end
+
+  def categories_with_children(categories)
+    parent_to_children = Hash.new { |hash, key| hash[key] = [] }
+    categories.each do |category|
+      next unless category.parentCategory
+      category.parentCategory.each do |parent_id|
+        parent_acronym = id_to_acronym(parent_id)
+        child_acronym = id_to_acronym(category.id)
+        parent_to_children[parent_acronym] << child_acronym
+      end
+    end
+    parent_to_children
+  end
+
+  def categories_with_parents(categories_children)
+    categories_parents = Hash.new { |hash, key| hash[key] = [] }
+    categories_children.each do |child, parents|
+      parents.each do |parent|
+        categories_parents[parent] << child
+      end
+    end
+    categories_parents
+  end
+
+  def id_to_acronym(id)
+    id.split('/').last
   end
 
 end
