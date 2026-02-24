@@ -183,3 +183,9 @@ group :test do
 end
 
 gem 'openid_connect', '~> 2.2.0'
+gem "sparql", "~> 3.3"
+# Feature flipping
+gem 'flipper'
+gem 'flipper-ui'
+gem 'flipper-active_record'
+gem 'flipper-active_support_cache_store'
