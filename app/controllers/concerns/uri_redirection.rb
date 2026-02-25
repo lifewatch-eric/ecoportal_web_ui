@@ -52,7 +52,7 @@ module UriRedirection
     # search for URIs that ends with "/id" or "#id"
     result = search_content(q: "*##{id} || *\/#{id}", qf: "resource_id", page: 1, pagesize: 10, ontologies: acronym)
 
-    find_exact_resource = result[:collection].select { |x| helpers.link_last_part(x[:resource_id]).eql?(id) }.first
+    find_exact_resource = result[:collection]&.select { |x| helpers.link_last_part(x[:resource_id]).eql?(id) }&.first
 
     if !find_exact_resource
       type = nil
