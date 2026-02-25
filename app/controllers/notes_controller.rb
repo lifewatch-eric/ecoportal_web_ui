@@ -79,8 +79,8 @@ class NotesController < ApplicationController
       parent_note = LinkedData::Client::Models::Note.find(params[:parent])
       # get creator
       creator_id = parent_note.creator
-      creator_email= LinkedData::Client::Models::User.find(creator_id).email
-      NoteMailer.reply_to_comment(new_note, creator_email)
+      creator_email = LinkedData::Client::Models::User.find(creator_id)&.email
+      ReplyNotificationMailer.reply_to_comment(creator_email, new_note, parent_note, session[:user].username).deliver rescue nil if creator_email
       success_message = ''
       locals =  { note: new_note, parent_id: params[:parent]}
       partial = 'notes/reply/reply'

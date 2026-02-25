@@ -1,17 +1,12 @@
 class ReplyNotificationMailer < ApplicationMailer
-
-
-
-  def reply_to_comment(creatorEmail,reply)
-    @creatorEmail = creatorEmail
+  def reply_to_comment(creator_email, reply, parent_note, replier_username)
     @reply = reply
+    @parent_note = parent_note
+    @replier_username = replier_username
+
     mail(
-      :to => creatorEmail,
-      :from => $SUPPORT_EMAIL,
-      :subject => "Re: #{reply.comment.title}",
-      :body => "Dear #{@creatorEmail},\n\n#{@reply.user.name} has replied to your comment on the article \"#{reply.comment.title}\".\n\n#{@reply.content}\n\nBest regards,\nYour EcoPortal Team"
+      to: creator_email,
+      subject: "New reply to your note: #{parent_note.subject}"
     )
-    end
-
-
+  end
 end
