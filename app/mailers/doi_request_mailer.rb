@@ -1,11 +1,13 @@
 class DoiRequestMailer < ApplicationMailer
-  def new_doi_request(ontology, submission_id, requester_username)
+  def new_doi_request(ontology, submission_id, requester_username, admin_emails = [])
     @ontology = ontology
     @submission_id = submission_id
     @requester_username = requester_username
 
+    recipients = admin_emails.presence || [$SUPPORT_EMAIL]
+
     mail(
-      to: $SUPPORT_EMAIL,
+      to: recipients,
       subject: "New DOI request pending for #{ontology.name} (#{ontology.acronym})"
     )
   end
