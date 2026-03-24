@@ -62,6 +62,7 @@ module OntologiesHelper
 
     content_tag(:div, class: 'creation_text') do
       concat(t('ontologies.referred_to'))
+      concat(' ')
       concat(content_tag(:span, class: 'date_creation_text') do
         if alt_labels.length > 1
           concat("#{alt_labels[0..-2].join(', ')} or #{alt_labels.last}.")
@@ -136,7 +137,7 @@ module OntologiesHelper
 
   def social_share_link(ont, sharer)
     return <<-HTML
-      <a href='javascript:;' 
+      <a href='javascript:;'
         aria-label='Share on #{sharer}'
         title='Share on #{sharer}'
         style='margin-left: 0.5rem'
