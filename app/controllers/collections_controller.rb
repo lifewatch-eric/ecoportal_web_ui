@@ -51,7 +51,7 @@ class CollectionsController < ApplicationController
     collection_label = params[:id] if collection_label.nil? || collection_label.empty?
 
     label = helpers.main_language_label(collection_label)
-    link = collection_path(collection_id: params[:id], ontology_id: params[:ontology_id], language: request_lang)
+    link = collection_path(collection_id: params[:id], ontology_id: params[:ontology] || params[:ontology_id], language: request_lang)
     render(inline: helpers.ajax_link_chip(params[:id], label, link, external: collection.blank?), layout: false)
   end
 
