@@ -1,0 +1,10 @@
+<p>A new DOI request has been submitted and is pending review.</p>
+
+<ul>
+  <li><strong>Ontology:</strong> <%= @ontology.name %> (<%= @ontology.acronym %>)</li>
+  <li><strong>Submission:</strong> <%= @submission_id %></li>
+  <li><strong>Requested by:</strong> <%= @requester_username %></li>
+  <li><strong>Date:</strong> <%= DateTime.now.strftime('%Y-%m-%d %H:%M UTC') %></li>
+</ul>
+
+<p>Please review and process the request in the admin panel.</p>
