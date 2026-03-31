@@ -8,6 +8,7 @@ class DoiRequestMailer < ApplicationMailer
 
     mail(
       to: recipients,
+      from: $SUPPORT_EMAIL,
       subject: "New DOI request pending for #{ontology.name} (#{ontology.acronym})"
     )
   end
