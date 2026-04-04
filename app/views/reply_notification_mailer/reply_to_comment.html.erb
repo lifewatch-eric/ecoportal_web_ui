@@ -1,6 +1,9 @@
 <p>Hello,</p>
 
-<p><strong><%= @replier_username %></strong> has replied to your note "<strong><%= @parent_note.subject %></strong>".</p>
+<p>
+  <strong><%= @replier_username %></strong> has replied to your <strong><%= @parent_resource.is_a?(LinkedData::Client::Models::Note) ? 'note' : 'reply' %></strong>:
+  "<strong><%= @parent_resource.subject.presence || @parent_resource.body %></strong>".
+</p>
 
 <p><strong>Reply:</strong></p>
 <p><%= @reply.body %></p>
