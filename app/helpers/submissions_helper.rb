@@ -90,7 +90,7 @@ module SubmissionsHelper
   end
 
   def display_submission_attributes(acronym, attributes, submissionId: nil, inline_save: false)
-    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(acronym).first
+    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(acronym, include: 'all').first
     @selected_attributes = attributes
     @inline_save = inline_save
 
