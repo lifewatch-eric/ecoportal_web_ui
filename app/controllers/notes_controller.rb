@@ -113,6 +113,7 @@ class NotesController < ApplicationController
     if new_note.errors
       render_turbo_stream alert_error(id: alerts_container_id) { response_errors(new_note).to_s }
     else
+      send_reply_mail(new_note, params[:parent]) if params[:type].eql?("reply")
       streams = [prepend(container_id, partial: partial, locals: locals)]
       streams.unshift(alert_success { success_message }) unless params[:type].eql?("reply")
 
@@ -185,4 +186,28 @@ class NotesController < ApplicationController
     CGI.unescape(id)
   end
 
+  def send_reply_mail(reply, parent_id)
+    parent_resource = find_note_or_reply(parent_id)
+    return if parent_resource.nil?
+
+    creator_id = parent_resource.creator
+    return if creator_id.blank?
+
+    creator_email = LinkedData::Client::Models::User.find(creator_id)&.email
+    ReplyNotificationMailer.reply_to_comment(creator_email, reply, parent_resource, session[:user].username).deliver rescue nil if creator_email
+  rescue StandardError
+    nil
+  end
+
+  def find_note_or_reply(resource_id, include_all: false)
+    resource_id = resource_id&.id if resource_id.respond_to?(:id)
+    resource_id = resource_id.to_s
+    params = include_all ? { include: 'all' } : {}
+
+    if resource_id.include?('/replies/')
+      LinkedData::Client::Models::Reply.find(resource_id, params)
+    elsif resource_id.include?('/notes/')
+      LinkedData::Client::Models::Note.find(resource_id, params)
+    end
+  end
 end
