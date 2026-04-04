@@ -216,8 +216,8 @@ $HOME_PAGE_LOGOS = [
 $PORTALS_INSTANCES = [
   {
     name: 'AgroPortal',
-    api: 'https://data.agroportal.lirmm.fr',
-    ui: 'https://agroportal.lirmm.fr/',
+    api: 'https://data.agroportal.eu',
+    ui: 'https://agroportal.eu/',
     color: '#3CB371',
     apikey: '1de0a270-29c5-4dda-b043-7c3580628cd5',
     'light-color': '#F1F6FA',
