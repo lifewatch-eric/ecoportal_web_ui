@@ -395,7 +395,7 @@ i.fa.fa-caret-square-o-down {
 }
 .home-section-sub-sections-container {
   display: flex;
-  justify-content: space-between;
+  width: 100%;
 }
 .home-sub-section-left {
   width: 550px;
@@ -404,35 +404,37 @@ i.fa.fa-caret-square-o-down {
 .home-sub-section-right {
   width: 550px;
 }
+.home-sub-section-full {
+  width: 100%;
+}
 .home-sub-section-left h4,
-.home-sub-section-right h4 {
+.home-sub-section-right h4,
+.home-sub-section-full h4 {
   font-size: 20px;
   margin-bottom: 5px;
   font-weight: 700;
 }
 .home-fair-scores {
-  height: 360px;
-  padding-top: 35px;
-}
-.home-twitter-news {
-  height: 360px;
+  min-height: 360px;
+  padding: 35px 32px 24px;
 }
 .home-fair-scores a {
   text-decoration: none;
 }
 .home-fair-details {
-  margin-right: 25px !important;
+  margin-right: 0 !important;
 }
-.home-fair-scores div {
+.home-fair-scores > div,
+.home-fair-scores > a > div {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
-  margin-right: 20px;
-  margin-left: 27px;
+  margin-right: 0;
+  margin-left: 0;
   margin-bottom: 14px;
   color: var(--primary-color);
 }
-.home-fair-scores div p {
+.home-fair-scores > a > div p {
   margin-right: 10px;
   margin-bottom: 0;
 }
@@ -518,7 +520,10 @@ i.fa.fa-caret-square-o-down {
   object-fit: scale-down;
 }
 .fair-scores-badge-section {
-  height: 5px !important;
+  height: auto !important;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 8px;
 }
 .fair-scores-badge-margin {
   margin-right: 10px;
@@ -586,8 +591,12 @@ i.fa.fa-caret-square-o-down {
     width: 100%;
     margin-top: 50px;
   }
-  .home-fair-scores div {
-    padding: 0 10%;
+  .home-sub-section-full {
+    width: 100%;
+  }
+  .home-fair-scores > div,
+  .home-fair-scores > a > div {
+    padding: 0;
   }
   .home-fair-scores {
     height: unset;
