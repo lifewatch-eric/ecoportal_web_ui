@@ -87,8 +87,7 @@ module SubmissionFilter
     submissions = ontologies.map { |ont| ontology_hash(ont, submissions) }
 
     submissions.map do |s|
-      out = (s[:ontology].viewingRestriction.eql?('public') && !private_only) ||
-            (s[:ontology].viewingRestriction.eql?('private') && (private_only || s[:ontology].access?(session[:user]) || session[:user]&.id.present?))
+      out = ontology_visible_for_browse?(s[:ontology], private_only)
       out = out && (groups.blank? || (s[:ontology].group.map { |x| helpers.link_last_part(x) } & groups.split(',')).any?)
       out = out && (categories.blank? || (s[:ontology].hasDomain.map { |x| helpers.link_last_part(x) } & categories.split(',')).any?)
       out = out && (status.blank? || status.eql?('alpha,beta,production,retired') || s[:status].nil? || status.split(',').include?(s[:status]))
@@ -117,6 +116,17 @@ module SubmissionFilter
       end
 
     end.compact
+  end
+
+  def ontology_visible_for_browse?(ontology, private_only)
+    case ontology.viewingRestriction.to_s.downcase
+    when 'public'
+      !private_only
+    when 'private'
+      ontology.access?(session[:user])
+    else
+      false
+    end
   end
 
   def paginate_submissions(all_submissions, page, size)

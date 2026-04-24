@@ -264,7 +264,7 @@ class OntologiesController < ApplicationController
       return
     end
 
-    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology]).first
+    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology], include: 'all').first
 
     if @ontology.nil? || @ontology.errors
       if ontology_access_denied?
@@ -273,6 +273,11 @@ class OntologiesController < ApplicationController
       else
         ontology_not_found(params[:ontology])
       end
+    end
+
+    unless @ontology.access?(session[:user])
+      redirect_to "/login?redirect=/ontologies/#{params[:ontology]}", alert: t('login.private_ontology')
+      return
     end
 
     # Handle the case where an ontology is converted to summary only.
