@@ -86,7 +86,7 @@ class AnnotatorController < ApplicationController
         api_params[:ontologies] = filtred_ontologies.join(',')
       end
 
-      annotations = LinkedData::Client::HTTP.get(uri, api_params)
+      annotations = LinkedData::Client::HTTP.get(uri.dup, api_params)
       @ontologies = LinkedData::Client::Models::Ontology.all({:include_views => true}).map{ |o| [o.id.to_s, o]}.to_h
 
       @semantic_types = get_semantic_types

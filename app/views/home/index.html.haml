@@ -23,17 +23,17 @@
       .home-bubble.home-bubble-one
         %a.h5{href:"/ontologies/#{@anal_ont_names[0]}", style: "color: white !important"}
           = @anal_ont_names[0]
-        %p 
+        %p
           = format_number_abbreviated(@anal_ont_numbers[0]) + " " + t('visits.visits')
       .home-bubble.home-bubble-two
         %a.h5{href:"/ontologies/#{@anal_ont_names[1]}", style: "color: white !important"}
           = @anal_ont_names[1]
-        %p 
+        %p
           = format_number_abbreviated(@anal_ont_numbers[1]) + " " + t('visits.visits')
       .home-bubble.home-bubble-three
         %a.h5{href:"/ontologies/#{@anal_ont_names[2]}", style: "color: white !important"}
           = @anal_ont_names[2]
-        %p 
+        %p
           = format_number_abbreviated(@anal_ont_numbers[2]) + " " + t('visits.visits')
       %a.home-bubble.home-bubble-four{:href => "/visits"}
         .h5 ...
@@ -105,7 +105,7 @@
               %img{:src => asset_path("play-white.svg")}/
   .home-section
     .home-section-sub-sections-container
-      .home-sub-section-left
+      .home-sub-section-full
         %div.align-items
           %h4.margin-items= t('home.fairness')
           = render Display::InfoTooltipComponent.new(text: t('home.info_tooltip_text') )
@@ -139,7 +139,7 @@
           %div.align-items
             %h4.margin-items= t('home.agents')
             = render Display::InfoTooltipComponent.new(text: t('home.index.agents_tooltip', portalName: $SITE) )
-            = render IconWithTooltipComponent.new(icon: 'json.svg',link: agents_rest_url, size:'small', style: "margin:0px 0px 6px 6px; vertical-align: top;", title: t("components.go_to_api"))  
+            = render IconWithTooltipComponent.new(icon: 'json.svg',link: agents_rest_url, size:'small', style: "margin:0px 0px 6px 6px; vertical-align: top;", title: t("components.go_to_api"))
           %hr.home-section-line/
           = turbo_frame_tag "agents_frame", src: home_agents_path, loading: "lazy" do
             .home-agents-container

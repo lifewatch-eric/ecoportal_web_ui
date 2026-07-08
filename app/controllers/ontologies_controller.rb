@@ -181,6 +181,9 @@ class OntologiesController < ApplicationController
 
   def notes
     @notes = @ontology.explore.notes
+
+    @notes = @notes.reject(&:archived) unless current_user_admin?
+
     @notes_deletable = false
     # TODO_REV: Handle notes deletion
     # @notes.each {|n| @notes_deletable = true if n.deletable?(session[:user])} if @notes.kind_of?(Array)
@@ -259,7 +262,7 @@ class OntologiesController < ApplicationController
       return
     end
 
-    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology]).first
+    @ontology = LinkedData::Client::Models::Ontology.find_by_acronym(params[:ontology], include: 'all').first
 
     if @ontology.nil? || @ontology.errors
       if ontology_access_denied?
@@ -268,6 +271,11 @@ class OntologiesController < ApplicationController
       else
         ontology_not_found(params[:ontology])
       end
+    end
+
+    unless @ontology.access?(session[:user])
+      redirect_to "/login?redirect=/ontologies/#{params[:ontology]}", alert: t('login.private_ontology')
+      return
     end
 
     # Handle the case where an ontology is converted to summary only.
