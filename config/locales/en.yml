@@ -598,8 +598,10 @@ en:
     info_tooltip_text: 'You are seing the average scores for all the public semantic resources in EcoPortal. FAIR scores are computed with the O''FAIRe methodology. More details here: https://github.com/agroportal/fairness'
     min: Min
     max: Max
-    ontologies: Semantic resources
+    ontologies: Ontologies
     agents_tooltip: Top 5 agents with the highest ontology usage
+    properties: Properties
+    projects: Projects
     individuals: Individuals
     mappings: Mappings
     users: Users
