@@ -1322,6 +1322,14 @@ en:
       project: Project
       turbo_confirm: Are you sure?
     show:
+      first_name: First Name
+      last_name: Last Name
+      email: Email
+      username: Username
+      github_id: Github account
+      mailing_list_subscription: Mailing List Subscription
+      mailing_list_description: Register to the %{portal} mailing list.
+      my_account: My Account
       accessible_semantic_resources: Accessible ontologies
       api_documentation: API documentation
       custom_semantic_resource: Custom semantic resource set

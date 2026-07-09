@@ -2,13 +2,16 @@ set :author, "lifewatch-eric"
 set :application, "ecoportal_web_ui"
 set :rails_env, "appliance"
 set :repo_url, "https://github.com/#{fetch(:author)}/#{fetch(:application)}.git"
+set :default_env, {
+  'PATH' => "/usr/local/rbenv/shims:/usr/local/rbenv/bin:$PATH"
+}
 
 set :deploy_via, :remote_cache
 
 
 
 # Default deploy_to directory is /var/www/my_app
-set :deploy_to, "/srv/ontoportal/bioportal_web_ui"
+set :deploy_to, "/opt/ontoportal/bioportal_web_ui"
 
 # Default value for :log_level is :debug
 set :log_level, :error

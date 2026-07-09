@@ -25,7 +25,7 @@ class Admin::CatalogConfigurationController < ApplicationController
     session[:catalog_data] = @catalog_data
     @catalog_metadata = session[:catalog_metadata] || load_catalog_metadata
     @catalog_groups = attributes_groups
-    
+
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
@@ -44,10 +44,10 @@ class Admin::CatalogConfigurationController < ApplicationController
 
     @catalog_data = session[:catalog_data] || load_catalog_data
     @catalog_metadata = session[:catalog_metadata] || load_catalog_metadata
-    
+
     @value_attrs = @catalog_data&.dig(@key) || []
     @field_names = extract_field_names_for_key(@key)
-    
+
     render partial: 'edit_nested_form_modal', layout: false
   end
 
@@ -58,16 +58,16 @@ class Admin::CatalogConfigurationController < ApplicationController
       general: %w[acronym title identifier versionInfo status],
       licensing: %w[accessRights rightsHolder license morePermissions],
       description: %w[
-        description comment keyword alternative hiddenLabel 
+        description comment keyword alternative hiddenLabel
         bibliographicCitation isReferencedBy
       ],
       dates: %w[created modified],
       agents: %w[
-        creator contributor publisher contactPoint curatedBy 
+        creator contributor publisher contactPoint curatedBy
         translator endorsedBy fundedBy funding
       ],
       community: %w[
-        audience publishingPrinciples repository bugDatabase 
+        audience publishingPrinciples repository bugDatabase
         mailingList toDoList award
       ],
       usage: %w[knownUsage coverage example themeTaxonomy],
@@ -83,7 +83,7 @@ class Admin::CatalogConfigurationController < ApplicationController
 
   def agents_list
     %w[
-      rightsHolder contactPoint creator contributor curatedBy 
+      rightsHolder contactPoint creator contributor curatedBy
       translator publisher endorsedBy
     ].freeze
   end
@@ -92,10 +92,10 @@ class Admin::CatalogConfigurationController < ApplicationController
     return @catalog_data if @catalog_data
 
     params = build_catalog_params(exclude_agents: true)
-    @catalog_data = LinkedData::Client::HTTP.get(CATALOG_PATH, params).to_hash
+    @catalog_data = catalog_response_to_hash(LinkedData::Client::HTTP.get(CATALOG_PATH, params))
     agent_params = build_catalog_params(agents_only: true)
-    catalog_agents = LinkedData::Client::HTTP.get(CATALOG_PATH, agent_params).to_hash
-    @catalog_data.merge!(catalog_agents.to_hash)
+    catalog_agents = catalog_response_to_hash(LinkedData::Client::HTTP.get(CATALOG_PATH, agent_params))
+    @catalog_data.merge!(catalog_agents)
     @catalog_data = sanitize_catalog_data(@catalog_data)
     session[:catalog_data] = @catalog_data
     @catalog_data
@@ -110,10 +110,10 @@ class Admin::CatalogConfigurationController < ApplicationController
     return @catalog_metadata if @catalog_metadata
 
     catalog_metadata_list = LinkedData::Client::HTTP.get(CATALOG_METADATA_URL, {})
-    filtered_metadata = catalog_metadata_list.select do |metadata| 
-      list_included_attributes.include?(metadata.attribute) 
+    filtered_metadata = catalog_metadata_list.select do |metadata|
+      list_included_attributes.include?(metadata.attribute)
     end
-    
+
     @catalog_metadata = filtered_metadata.index_by(&:attribute)
     session[:catalog_metadata] = @catalog_metadata
     @catalog_metadata
@@ -125,12 +125,12 @@ class Admin::CatalogConfigurationController < ApplicationController
 
   def build_catalog_params(exclude_agents: false, agents_only: false)
     included_attrs = if agents_only
-                      agents_list
-                    elsif exclude_agents
-                      list_included_attributes - agents_list
-                    else
-                      list_included_attributes
-                    end
+                       agents_list
+                     elsif exclude_agents
+                       list_included_attributes - agents_list
+                     else
+                       list_included_attributes
+                     end
 
     {
       include: included_attrs.join(','),
@@ -147,11 +147,25 @@ class Admin::CatalogConfigurationController < ApplicationController
     OpenStruct.new(status: 500, body: e.message)
   end
 
+  def handle_catalog_error(error, resource_name)
+    Rails.logger.error("Failed to load #{resource_name}: #{error.class}: #{error.message}")
+    flash.now[:alert] ||= "Problem loading #{resource_name}: #{error.message}"
+  end
+
+  def catalog_response_to_hash(response)
+    return response.to_hash if response.respond_to?(:to_hash)
+    return response.to_h if response.respond_to?(:to_h)
+
+    response
+  end
+
   def sanitize_catalog_data(catalog_data)
     catalog_data_sanitized = catalog_data
     # sanitize themeTaxonomy to let only the acronyms of the ontologies
-    catalog_data_sanitized[:themeTaxonomy] = catalog_data_sanitized[:themeTaxonomy].select { |url| url.start_with?(rest_url) }.map { |url| url.split('/').last }
-    return catalog_data_sanitized
+    catalog_data_sanitized[:themeTaxonomy] = Array(catalog_data_sanitized[:themeTaxonomy]).select do |url|
+      url.to_s.start_with?(rest_url)
+    end.map { |url| url.to_s.split('/').last }
+    catalog_data_sanitized
   end
 
   def sanitize_config_params
@@ -164,8 +178,12 @@ class Admin::CatalogConfigurationController < ApplicationController
     config['rightsHolder'] = config['rightsHolder']&.first&.presence || '' if config['rightsHolder']
 
     # rebuild themeTaxonomy as URIs
-    config['themeTaxonomy'] = config['themeTaxonomy'].map { |value| "#{rest_url.chomp('/')}/#{value}" } if config['themeTaxonomy']
-    config['themeTaxonomy'] << "http://vocabularies.unesco.org/thesaurus" if config['themeTaxonomy']
+    if config['themeTaxonomy']
+      config['themeTaxonomy'] = config['themeTaxonomy'].map do |value|
+        "#{rest_url.chomp('/')}/#{value}"
+      end
+    end
+    config['themeTaxonomy'] << 'http://vocabularies.unesco.org/thesaurus' if config['themeTaxonomy']
     config.compact
   end
 
@@ -185,11 +203,9 @@ class Admin::CatalogConfigurationController < ApplicationController
   def extract_field_names_for_key(key)
     metadata = @catalog_metadata[key.to_s]
     return [] unless metadata&.enforcedValues
-    
+
     metadata.enforcedValues.flat_map do |field|
-      field.to_h.keys - [:links, :context]
+      field.to_h.keys - %i[links context]
     end
   end
-
-
 end
