@@ -28,7 +28,7 @@
     %hr.divider.w-100.mb-4.mt-4
     %p.dont-have-account
       Or sign in with
-    %div
+    %div.d-flex.justify-content-around.flew-wrap
       - omniauth_providers_info.each do |provider, config|
         - if config[:enable]
           = button_to  "/auth/#{config[:name] || config[:strategy] || provider}",

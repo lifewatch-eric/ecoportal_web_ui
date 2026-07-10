@@ -1352,6 +1352,7 @@ en:
       orcid_id: 'ORCID:'
       subscribe: Subscribe
       subscriptions: Subscriptions
+  no_result_was_found: No result was found
   notes:
     no_notes: No notes to display
     filter_hide_archived: Hide Archived
@@ -1491,6 +1492,7 @@ en:
       show_private_ontology: Show private semantic resource only
       show_ontology_views: Show semantic resource views
       show_retired_ontologies: Show retired semantic resources
+      show_my_ontologies: Show my semantic resources
       search_placeholder: Start typing to filter semantic resources, e.g., AGROVOC...
     sections:
       classes: Classes
