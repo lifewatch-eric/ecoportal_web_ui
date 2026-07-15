@@ -583,6 +583,7 @@ en:
     get_recommendations: Get recommendations
     go_to_api: Go to API
     index:
+      agents_tooltip: Top 5 agents with the highest ontology usage
       tagline: The LifeWatch ERIC repository of semantic resources for ecology and related domains
       title: Welcome to %{site}
       welcome: Welcome to %{site},
@@ -704,6 +705,7 @@ en:
       search_prompt: Search in %{portal_name} ...
       submit_feedback: Send Feedback
       support: Support
+      sparql_editor: SPARQL Editor
     footer:
       products: Products
       ontoportal: OntoPortal
@@ -795,6 +797,7 @@ en:
     external_mappings: External Mappings (%{number_with_delimiter})
     interportal_mappings: Interportal Mappings - %{acronym} (%{number_with_delimiter})
     mapping_created: Mapping created
+    create_new_mapping: Create new mapping
     mapping_updated: Mapping updated
     mapping_deleted: "%{map_id} deleted successfully"
     mapping_not_found: Mapping %{id} not found
@@ -973,7 +976,7 @@ en:
       widget_block_component_title_2: Autocomplete
       widget_block_component_title_3: Visualization
       widget_block_component_title_4: Tree Widget
-      widgets: Widgets are only available for ontologies stored in %{site}.
+      widgets: Widgets
       collections: Collections
       concepts: Concepts
       instances: Instances
@@ -1108,7 +1111,10 @@ en:
     project_successfully_deleted: Project successfully deleted
     project_successfully_updated: Project successfully updated
     self: Projects
+    title: Projects list
+    view_projects_help: View projects help
     show:
+      title: Project %{name}
       contacts: 'Contacts:'
       description: 'Description:'
       edit_project: Edit Project
@@ -1311,10 +1317,31 @@ en:
     valid_email_adresse: Please enter a valid email adresse
     validate_terms_and_conditions: Accepting the terms and conditions is required, please check the box to proceed.
     first_name_required: First name field is required
+    edit:
+      admin_privileges: "Are you sure you want to revoke admin privileges for this user?"
+      change_password: "Change password"
+      confirm_password: "Confirm password"
+      edit_information: "Edit personal information"
+      email: "Email"
+      errors_creating_account: "Errors creating your account:"
+      first_name: "First name"
+      github_id: "Github account"
+      last_name: "Last name"
+      new_password: "New password"
+      orcid_id: "ORCID"
+      user_to_admin: "Are you sure you want to make this user an admin?"
+      username: "Username"
     last_name_required: Last name field is required
     index:
+      actions: "Actions"
+      created: "Created At"
+      delete: "Delete"
+      detail: "Detail"
       first_name: First name
       last_name: Last name
+      error_delete_message: "Can't delete this user because still used"
+      last_login: "Last login"
+      login_as: "Login as"
       username: Username
       email: Email
       roles: Roles
@@ -1332,6 +1359,7 @@ en:
       my_account: My Account
       accessible_semantic_resources: Accessible ontologies
       api_documentation: API documentation
+      api_key_description: "Your API Key can be used to access  %{portal} Web services"
       custom_semantic_resource: Custom semantic resource set
       please: Please
       modify_custom_semantic_resource: |
@@ -1352,6 +1380,7 @@ en:
       orcid_id: 'ORCID:'
       subscribe: Subscribe
       subscriptions: Subscriptions
+      unsubscribe: "Unsubscribe"
   no_result_was_found: No result was found
   notes:
     no_notes: No notes to display
@@ -1400,7 +1429,29 @@ en:
       save: Save
       cancel: Cancel
   ontologies:
+    admin:
+      title: "Administration"
+      submissions:
+        title: "Submissions"
+        table:
+          select: "Select"
+          submission_id: "Submission ID"
+          release_date: "Release Date"
+          status: "Status"
+          actions: "Actions"
+        delete: "Delete"
+        confirm_delete: "Are you sure you want to delete the submission %{submission_id} ?"
+        delete_selected: "Delete Selected"
+        confirm_delete_selected: "Are you sure you want to delete selected submissions?"
+        select_at_least_one: "Please select at least one submission to delete."
+        loading: "Loading submissions..."
+      log:
+        title: "Processing logs"
+        loading: "Loading log..."
+        no_log: "No log available."
+        parse_error: "Error parsing log: %{message}"
     showing_ontologies_size: Showing %{ontologies_size} of %{analytics_size} from %{portals}
+    showing_ontologies_user_size: Showing %{ontologies_size} of %{analytics_size} ontology in %{time}s
     filters: Filters
     no_license: No license
     view_license: View license
@@ -1489,11 +1540,14 @@ en:
       filter: Filter
     browser:
       admin_welcome: Welcome admin,this coloring indicates admin-only features
+      show_public_ontology: Show public ontology only
       show_private_ontology: Show private semantic resource only
       show_ontology_views: Show semantic resource views
       show_retired_ontologies: Show retired semantic resources
       show_my_ontologies: Show my semantic resources
       search_placeholder: Start typing to filter semantic resources, e.g., AGROVOC...
+    user_ontologies:
+      no_ontology_found: "Ready to contribute?\n Submit your first ontology and start building your collection."
     sections:
       classes: Classes
       individuals: Individuals
@@ -1525,7 +1579,7 @@ en:
       label_groups: Groups
       download_as_csv: Download as CSV
       scroll_down_to_see_more: Scroll down to see more
-      widgets: Widgets are only available for semantic resources stored in %{site}.
+      widgets: Widgets
       add_acronym_widgets: Add %{acronym} Web Widgets to your site
       widget_block_component_title_1: Jump To
       widget_block_component_description_1: Type a class name from %{acronym} and jump to it in %{site}
@@ -1596,10 +1650,13 @@ en:
         categories_and_subjects: Categories and subjects
         keywords_and_classes: Keywords and classes
         languages: Languages
+        keywords: Keywords
         pull_location: Pull location
         export_metadata: Export all metadata
         abstract: Abstract
         description: Description
+        categories: Categories
+        subjects: Subjects
     htaccess_modal_title: Rewrite rules for %{acronym} semantic resource
     instructions_servers: Instructions for %{server} servers
     htaccess_redirection_description: We offer a seamless solution to make your semantic resource URIs resolvable and content negotiable by allowing URL redirection for your semantic resource URIs to our EcoPortal URIs. To facilitate this process, we've provided you with a set of .htaccess rewrite rules. By following the simple instructions below, you'll be able to implement these rules swiftly and efficiently, ensuring smooth redirection
@@ -1638,3 +1695,8 @@ en:
     name: name
     visits: visits
     count: concepts
+  sparql_endpoint:
+    description: 'Query structured datasets using SPARQL to retrieve, filter, and manipulate semantic artefacts efficiently. '
+    title: SPARQL Query Editor
+    private_ontology_warning: Make the ontology public to enable access from the SPARQL endpoint.
+    edit_sample_queries: Edit sample queries
