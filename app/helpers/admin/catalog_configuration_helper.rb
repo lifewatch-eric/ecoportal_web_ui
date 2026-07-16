@@ -29,10 +29,18 @@ module Admin::CatalogConfigurationHelper
       display_context: false,
       _ts: Time.current.to_i
     }
-    result = LinkedData::Client::HTTP.get("#{LinkedData::Client.settings.rest_url}/", params).to_hash
-    ontologies = []
-    ontologies = result[:themeTaxonomy]&.filter { |u| u.strip.start_with?(rest_url) }.map { |u| u.strip.split('/').last }
-    return ontologies
+    response = LinkedData::Client::HTTP.get("#{LinkedData::Client.settings.rest_url}/", params)
+    result = if response.respond_to?(:to_hash)
+               response.to_hash
+             elsif response.respond_to?(:to_h)
+               response.to_h
+             end || {}
+    puts "Result #{result}"
+    puts "URL: #{LinkedData::Client.settings.rest_url} Params #{params}"
+    theme_taxonomy = result[:themeTaxonomy] || result['themeTaxonomy']
+    Array(theme_taxonomy).filter do |u|
+      u.to_s.strip.start_with?(rest_url)
+    end.map { |u| u.to_s.strip.split('/').last }
   end
 
   private
