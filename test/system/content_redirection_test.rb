@@ -7,7 +7,8 @@ class ContentRedirectionTest < ApplicationSystemTestCase
 
     @sty_url = root_url + 'ontologies/STY'
     @ontology_portal_uri = 'div.field-container p.field-description_text'
-    @htaccess_button = 'a[data-show-modal-title-value="Rewrite rules for STY ontology"]'
+    modal_title = I18n.t('ontologies.htaccess_modal_title', acronym: 'STY')
+    @htaccess_button = "a[data-show-modal-title-value=\"#{modal_title}\"]"
     @redirection_modal = 'div#redirection_rules_modal'
     @htaccess_code = 'div.htacess-code-container'
     @nginx_code = 'div.nginx-code-container'

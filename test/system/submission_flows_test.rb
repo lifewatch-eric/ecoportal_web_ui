@@ -32,15 +32,16 @@ class SubmissionFlowsTest < ApplicationSystemTestCase
   test "create a new ontology and go to it's summary page" do
     visit new_ontology_url
 
-    assert_text 'Submit new ontology', wait: 10
+    assert_text I18n.t('ontologies.submit_new_ontology'), wait: 10
 
     fill_ontology(@new_ontology, @new_submission)
 
-    assert_selector 'h2', text: 'Ontology submitted successfully!'
+    assert_selector 'h2', text: I18n.t('ontologies.ontology_submitted')
     click_on current_url.gsub("/ontologies/success/#{@new_ontology.acronym}", '') + ontology_path(@new_ontology.acronym)
 
     assert_text "#{@new_ontology.name} (#{@new_ontology.acronym})"
-    assert_selector '.alert-message', text: "The ontology is processing."
+    processing_message = I18n.t('ontologies.new_ontology_is_processing', ontology: '')
+    assert_selector '.alert-message', text: processing_message.split('Sections').first.strip
 
     @new_ontology.hasDomain.each do |cat|
       assert_text cat.acronym
@@ -344,11 +345,12 @@ class SubmissionFlowsTest < ApplicationSystemTestCase
 
     fill_ontology(ontology_2, submission_2, add_submission: true)
 
-    assert_selector 'h2', text: 'Ontology submitted successfully!'
+    assert_selector 'h2', text: I18n.t('ontologies.ontology_submitted')
     click_on current_url.gsub("/ontologies/success/#{existent_ontology.acronym}", '') + ontology_path(existent_ontology.acronym)
 
     assert_text "#{ontology_2.name} (#{existent_ontology.acronym})"
-    assert_selector '.alert-message', text: "The ontology is processing."
+    processing_message = I18n.t('ontologies.new_ontology_is_processing', ontology: '')
+    assert_selector '.alert-message', text: processing_message.split('Sections').first.strip
 
     ontology_2.hasDomain.each do |cat|
       assert_text cat.acronym.upcase

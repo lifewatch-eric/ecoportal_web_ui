@@ -40,30 +40,30 @@ class LoginFlowsTest < ApplicationSystemTestCase
 
     visit root_url + "/accounts/#{new_user.username}"
 
-    assert_selector '.account-page-title', text:  'My account'
+    assert_selector '.account-page-title', text: I18n.t('users.show.my_account')
 
-    assert_selector '.title', text: 'First name:'
+    assert_selector '.title', text: I18n.t('users.show.first_name')
     assert_selector '.info', text: new_user.firstName
 
-    assert_selector '.title', text: 'Last name:'
+    assert_selector '.title', text: I18n.t('users.show.last_name')
     assert_selector '.info', text: new_user.lastName
 
-    assert_selector '.title', text: 'Email:'
+    assert_selector '.title', text: I18n.t('users.show.email')
     assert_selector '.info', text: new_user.email
 
-    assert_selector '.title', text: 'Username:'
+    assert_selector '.title', text: I18n.t('users.show.username')
     assert_selector '.info', text: new_user.username
 
-    assert_selector '.title', text: 'ORCID:'
+    assert_selector '.title', text: I18n.t('users.show.orcid_id')
     assert_selector '.info', text: new_user.orcidId
 
-    assert_selector '.title', text: 'GitHub account:'
+    assert_selector '.title', text: I18n.t('users.show.github_id')
     assert_selector '.info', text: new_user.githubId
 
     assert_selector '.account-page-card-title', text: 'API Key'
-    assert_selector '.account-page-card-title', text: 'Subscriptions'
-    assert_selector '.account-page-card-title', text: 'Submitted ontologies'
-    assert_selector '.account-page-card-title', text: 'Projects created'
+    assert_selector '.account-page-card-title', text: I18n.t('users.show.subscriptions')
+    assert_selector '.account-page-card-title', text: I18n.t('users.show.submitted_semantic_resources')
+    assert_selector '.account-page-card-title', text: I18n.t('users.show.projects_created')
   end
 
   test "go to login page and click save" do
