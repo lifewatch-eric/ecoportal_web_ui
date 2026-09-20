@@ -70,7 +70,7 @@ module SubmissionsHelper
   end
 
   def render_submission_attribute(attribute, submission = @submission, ontology = @ontology)
-    render partial: 'ontologies_metadata_curator/attribute_inline_editable', locals: { attribute: attribute, submission: submission, ontology: ontology }
+    render partial: 'ontologies_metadata_curator/attribute', locals: { attribute: attribute, submission: submission, ontology: ontology }
   end
 
   def attribute_input_frame_id(acronym, submission_id, attribute)
@@ -118,9 +118,16 @@ module SubmissionsHelper
     equivalent_properties(attr.to_s).any? { |x| @selected_attributes.include?(x) }
   end
 
-  def save_button
+  def save_button(attribute: nil)
+    options = { data: { controller: 'tooltip' }, title: 'Save', class: 'btn btn-sm btn-light mx-1' }
+    if @ontology && @submission && attribute
+      options[:formaction] = "/ontologies/#{@ontology.acronym}/submissions/#{@submission.submissionId}?attribute=#{attribute}"
+      options[:formmethod] = 'post'
+      options[:data][:turbo_frame] = attribute_input_frame_id(@ontology.acronym, @submission.submissionId, attribute)
+    end
+
     content_tag :div do
-      button_tag({ data: { controller: 'tooltip' }, title: 'Save', class: 'btn btn-sm btn-light mx-1' }) do
+      button_tag(options) do
         content_tag(:i, "", class: 'fas fa-check')
       end
     end
@@ -149,7 +156,7 @@ module SubmissionsHelper
         if inline_save?
           html += tag.div(class: 'd-flex') do
             html = ''
-            html += save_button
+            html += save_button(attribute: attr)
             html += cancel_button(cancel_link(attribute: attr))
             html.html_safe
           end
@@ -165,7 +172,7 @@ module SubmissionsHelper
   end
 
   def format_equivalent
-    %w[hasOntologyLanguage prefLabelProperty synonymProperty definitionProperty authorProperty obsoleteProperty obsoleteParent]
+    %w[hasOntologyLanguage prefLabelProperty synonymProperty definitionProperty authorProperty obsoleteProperty]
   end
 
   def location_equivalent
@@ -191,14 +198,16 @@ module SubmissionsHelper
     out = submission_metadata.map { |x| x['attribute'] }.reject { |x| equivalents.include?(x) }
     out << [:format, format_equivalent]
     out << [:location, location_equivalent]
+    # Add mapping for subjects to hasDomain for submission scope
+    out << [:subjects, :hasDomain]
 
     out
   end
-  
+
   def equivalent_ontology_property(attr)
     equivalents = ontology_properties
     found = equivalents.select { |x| x.is_a?(Array) ? x[1].eql?(attr.to_sym) : x.eql?(attr)}
-    
+
     found.empty? ? nil : found.first.is_a?(Array) ? found.first[1] : found.first
   end
 
@@ -208,13 +217,27 @@ module SubmissionsHelper
   end
 
   def ontology_properties
-    ['acronym', 'name', [t('submission_inputs.visibility'), :viewingRestriction], 'viewOf', ['Groups', :group], ['Categories', :hasDomain], [t('submission_inputs.administrators'), :administeredBy], ['Sample Queries', :sampleQueries]]
+    [
+      [t('submission_inputs.acronym'), :acronym],
+      [t('submission_inputs.name'), :name],
+      [t('submission_inputs.visibility'), :viewingRestriction],
+      [t('submission_inputs.view_of'), :viewOf],
+      [t('submission_inputs.groups'), :group],
+      [t('submission_inputs.categories'), :hasDomain],
+      [t('submission_inputs.administrators'), :administeredBy],
+      [t('submission_inputs.sample_queries'), :sampleQueries]
+    ]
   end
 
   def submission_editable_properties
     properties = submission_properties.map do |x|
       if x.is_a? Array
-        [attr_label(x[0], show_tooltip: false), x[0]]
+        # Special case for subjects
+        if x[0] == :subjects
+          ['Subjects', :subjects]
+        else
+          [attr_label(x[0], show_tooltip: false), x[0]]
+        end
       else
         [attr_label(x, show_tooltip: false), x]
       end
@@ -347,11 +370,14 @@ module SubmissionsHelper
       end
     end
 
-    if selected_attribute?('categories')
+    selected = Array(@selected_attributes)
+    show_all = selected.empty?
+
+    if show_all || selected.include?('hasDomain') || selected.include?('categories')
       output += ontology_categories_input
     end
 
-    if selected_attribute?('hasDomain')
+    if show_all || selected.include?('subjects')
       output += ontology_submission_subjects_input
     end
 
@@ -370,10 +396,28 @@ module SubmissionsHelper
     if selected_attribute?('sampleQueries')
       output += render Input::InputFieldComponent.new(name: "config[sampleQueries]", label: "Sample Queries", error_message: attribute_error("sampleQueries")) do
         render SampleQueriesEditComponent.new(graph: @submission.id)
-      end  
+      end
     end
     render TurboFrameComponent.new(id: frame_id) do
       output.html_safe
     end
+  end
+
+  # Returns the display label for a property key as shown in the dropdown
+  def property_label(key)
+    # Look in ontology_properties first
+    ontology_properties.each do |item|
+      if item.is_a?(Array) && item[1].to_s == key.to_s
+        return item[0]
+      elsif item.to_s == key.to_s
+        return item.to_s.humanize
+      end
+    end
+    # Look in submission_editable_properties
+    submission_editable_properties.each do |label, value|
+      return label if value.to_s == key.to_s
+    end
+    # Fallback to humanize
+    key.to_s.humanize
   end
 end

@@ -191,17 +191,23 @@ module OntologiesHelper
         links << { href: uri, label: t('ontologies.home_page') }
       end
     else
-      uri = submission.id + "/download?apikey=#{get_apikey}"
-      links << { href: uri, label: submission.pretty_format }
+      uri = submission.id + "/download"
+      href, target = api_button_link_and_target(uri, allow_annonymous = true)
+      links << { href: href, label: submission.pretty_format, target: target }
       if submission_ready?(submission)
-        links << { href: "#{ontology.id}/download?apikey=#{get_apikey}&download_format=csv", label: "CSV" }
+        uri = "#{ontology.id}/download?download_format=csv"
+        href, target = api_button_link_and_target(uri, allow_annonymous = true)
+        links << { href: href, label: "CSV", target: target }
         unless submission.hasOntologyLanguage.eql?('UMLS')
-          links << { href: "#{ontology.id}/download?apikey=#{get_apikey}&download_format=rdf", label: "RDF/XML" }
+          uri = "#{ontology.id}/download?download_format=rdf"
+          href, target = api_button_link_and_target(uri, allow_annonymous = true)
+          links << { href: href, label: "RDF/XML", target: target }
         end
       end
       unless submission.diffFilePath.nil?
-        uri = submission.id + "/download_diff?apikey=#{get_apikey}"
-        links << { href: uri, label: "DIFF" }
+        uri = submission.id + "/download_diff"
+        href, target = api_button_link_and_target(uri, allow_annonymous = true)
+        links << { href: href, label: "DIFF", target: target }
       end
     end
     links
@@ -322,10 +328,10 @@ module OntologiesHelper
     begin
       category = LinkedData::Client::Models::Category.find(acronym)
       return if category.nil? || category.status == 404
-    
+
       render ChipButtonComponent.new(
         text: acronym.upcase,
-        tooltip: category.name, 
+        tooltip: category.name,
         type: "clickable",
         url: categories_browse_url(category.acronym),
         target: "_blank"
@@ -553,7 +559,7 @@ module OntologiesHelper
   end
 
   def ontology_object_json_link(ontology_acronym, object_type, id)
-    "#{rest_url}/ontologies/#{ontology_acronym}/#{object_type}/#{escape(id)}?display=all&apikey=#{get_apikey}"
+    "#{rest_url}/ontologies/#{ontology_acronym}/#{object_type}/#{escape(id)}?display=all"
   end
 
   def render_permalink_link
@@ -565,8 +571,9 @@ module OntologiesHelper
   end
 
   def render_concepts_json_button(link)
+    link, target = api_button_link_and_target(link)
     content_tag(:div, class: 'concepts_json_button') do
-      render RoundedButtonComponent.new(link: link, target: '_blank')
+      render RoundedButtonComponent.new(link: link, target: target)
     end
   end
 
@@ -578,7 +585,9 @@ module OntologiesHelper
       if object.errors
         alert_component(object.errors.join)
       else
-        ontology_object_tabs_component(ontology_id: ontology_id, objects_title: objects_title, object_id: object["@id"]) do |tabs|
+        ontology_object_tabs_component(ontology_id: ontology_id, objects_title: objects_title,
+                                       object_id: object["@id"],
+                                       api_link: ResourceLookupService.rest_served?(object)) do |tabs|
           tab_item_component(container_tabs: tabs, title: t('concepts.details'), path: '#details', selected: true) do
             capture(&block)
           end
@@ -587,13 +596,13 @@ module OntologiesHelper
     end
   end
 
-  def ontology_object_tabs_component(ontology_id:, objects_title:, object_id:, &block)
+  def ontology_object_tabs_component(ontology_id:, objects_title:, object_id:, api_link: true, &block)
     resource_url = ontology_object_json_link(ontology_id, objects_title, object_id)
     render TabsContainerComponent.new(type: 'outline') do |c|
       concat(c.pinned_right do
         content_tag(:div, '', 'data-concepts-json-target': 'button') do
           concat(render_permalink_link) if $PURL_ENABLED
-          concat(render_concepts_json_button(resource_url))
+          concat(render_concepts_json_button(resource_url)) if api_link
         end
       end)
 
@@ -637,37 +646,90 @@ module OntologiesHelper
 
   def ontology_icon_links(links, submission_latest)
     links.map do |icon, attr, label|
-      value = submission_latest.nil? ? nil : submission_latest.send(attr)
+      raw_value = submission_latest&.send(attr)
+      values = Array(raw_value).compact.reject(&:blank?)
 
-      link_options = {
-        style: "text-decoration: none; width: 30px; height: 30px"
-      }
-
-      if Array(value).empty?
-        link_options[:class] = 'disabled-icon'
-        link_options[:disabled] = 'disabled'
-        title = label
+      if values.empty?
+        ontology_icon_button(icon, "javascript:void(0);", label, class: 'disabled-icon', disabled: 'disabled')
+      elsif values.size == 1
+        link = values.first
+        url, target = api_button_link_and_target(link, true)
+        title = label + '<br>' + link_to(link, link, target: '_blank')
+        ontology_icon_button(icon, url, title, interactive: false, target: target)
       else
-        title = label + '<br>' + link_to(Array(value).first, target: '_blank')
-      end
-
-      url = Array(value).first || ''
-      if url.include?(rest_hostname)
-        url = url['?'] ? "#{url}&apikey=#{get_apikey}" : "#{url}?apikey=#{get_apikey}"
-      end
-
-      content_tag(:span, data: {controller: "tooltip" }, title: title) do
-        link_to(inline_svg("#{icon}.svg", width: "32", height: '32'), url, link_options.merge(target: '_blank'))
+        ontology_render_icon_dropdown(icon, attr, label, values)
       end
     end.join.html_safe
   end
 
+  def ontology_sparql_endpoint_link(submission_latest)
+    icon = 'summary/sparql'
+    attr = 'endpoint'
+    label = attr_label(attr, attr_metadata: attr_metadata(attr), show_tooltip: false)
+
+    raw_value = submission_latest&.send(attr)
+    values = Array(raw_value).compact.reject(&:blank?)
+
+    if values.empty?
+      ontology_icon_button(icon, "javascript:void(0);", label, class: 'disabled-icon', disabled: 'disabled')
+    elsif values.size == 1
+      link = values.first
+      url, target = api_button_link_and_target(link, true)
+      title = label + '<br>' + link_to(link, link, target: '_blank')
+      ontology_icon_button(icon, url, title, interactive: true, target: target)
+    else
+      title = "<b>#{label}</b>" + values.map { |v| "<br>" + link_to(v, v, target: '_blank') }.join
+      ontology_icon_button(icon, "javascript:void(0);", title, interactive: true)
+    end
+  end
+
+  def ontology_icon_button(icon, url, title, interactive: false, **options)
+    data = { controller: 'tooltip' }
+    data['tooltip-interactive-value'] = 'true' if interactive
+
+    options[:style] ||= "text-decoration: none; width: 30px; height: 30px"
+
+    content_tag(:span, data: data, title: title) do
+      link_to(inline_svg("#{icon}.svg", width: "32", height: '32'), url, options)
+    end
+  end
+
+  def ontology_render_icon_dropdown(icon, attr, label, values)
+    content_tag(:span, data: { controller: 'tooltip' }, title: label) do
+      content_tag(:div, class: 'dropdown d-inline-block') do
+        trigger = link_to(inline_svg("#{icon}.svg", width: '32', height: '32'), '#',
+                          class: 'text-decoration-none', id: "dropdown_icon_#{attr}",
+                          data: { toggle: 'dropdown', bs_toggle: 'dropdown' },
+                          aria: { haspopup: 'true', expanded: 'false' },
+                          style: 'width: 30px; height: 30px;')
+
+        menu = content_tag(:div, class: 'dropdown-menu shadow border-0 rounded p-2',
+                           aria: { labelledby: "dropdown_icon_#{attr}" },
+                           style: 'left: 50%; transform: translateX(-50%); min-width: max-content;') do
+          values.map do |v|
+            content_tag(:div, class: 'p-1') do
+              render LinkFieldComponent.new(value: v, raw: true, enable_copy: true)
+            end
+          end.join.html_safe
+        end
+        trigger + menu
+      end
+    end
+  end
+
   def ontology_depiction_card
-    return if Array(@submission_latest&.depiction).empty?
+    depictions = Array(@submission_latest&.depiction)
+    return if depictions.empty?
 
     render Layout::CardComponent.new do
-      list_container(@submission_latest.depiction) do |depiction_url|
-        render Display::ImageComponent.new(src: depiction_url)
+      if depictions.size == 1
+        render Display::ImageComponent.new(src: depictions.first)
+      else
+        render CarouselComponent.new(images: true) do |c|
+          depictions.each do |url|
+            c.slide { render Display::ImageComponent.new(src: url) }
+          end
+        end
       end
     end
   end
@@ -721,9 +783,9 @@ module OntologiesHelper
 
   def submission_json_button
     link = "#{(@submission_latest || @ontology).id}?display=all"
-    link += "&apikey=#{get_apikey}" unless session[:user].nil?
+    link, target = api_button_link_and_target(link)
     render RoundedButtonComponent.new(link: link,
-                                      target: '_blank',
+                                      target: target,
                                       size: 'medium',
                                       title: t('ontologies.go_to_api'))
   end
@@ -796,7 +858,8 @@ module OntologiesHelper
   end
 
   def service_button(link:, title: )
-    render IconWithTooltipComponent.new(icon: "json.svg",link: link, target: '_blank', title: title)
+    link, target = api_button_link_and_target(link)
+    render IconWithTooltipComponent.new(icon: "json.svg",link: link, target: target, title: title)
   end
 
   def n_triples_to_table(n_triples_string)

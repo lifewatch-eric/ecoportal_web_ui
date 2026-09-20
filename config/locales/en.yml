@@ -257,6 +257,65 @@ en:
       edit_button: Edit
       configuration_updated_successfully: Configuration updated successfully
       configuration_update_error: 'Problem updating the configuration: %{error}'
+      federation_provide_apikey: Please provide an APIKEY for the federation user corresponding to each portal in order to enable the federation.
+      federation_not_allowed: This portal isn't allowed to activate federation features.
+      federation_invalid_apikeys: 'The following portals were not added because their API key is invalid: %{portals}'
+    licenses:
+      create:
+        success: License renewed successfully
+      form:
+        license_from_being_saved: 'prohibited this license from being saved:'
+        paste_your_license: Paste your license key into the text area
+        submit: Submit
+      label_close: Close
+      license_notification:
+        license_contact: 'For more information, email <a href="mailto:support@ontoportal.org">support@ontoportal.org</a>
+          or  visit <a href="https://ontoportal.org/licensing" target="_blank">https://ontoportal.org/licensing</a>.
+
+          '
+        license_expired: 'We''re sorry, but the license for this OntoPortal installation
+          has expired. If you are the owner of this OntoPortal installation,  please
+          visit <a href="https://license.ontoportal.org" target="_blank">https://license.ontoportal.org</a>
+          to renew your license.
+
+          '
+        license_obtain: 'If you are the owner of this OntoPortal installation, you
+          can visit  <a href="https://license.ontoportal.org" target="_blank">https://license.ontoportal.org</a>
+          to obtain a license.
+
+          '
+        license_trial:
+          one: This installation of the OntoPortal Appliance is a trial license, which
+            will expire in 1 day.
+          other: This installation of the OntoPortal Appliance is a trial license,
+            which will expire in %{count} days.
+    memcache:
+      title: Memcache stats
+    new_ontologies_created_title: 'The following ontologies: %{count} were created
+      in this year'
+    no_flush_command: The UI cache does not respond to the 'flush_all' command
+    no_ontologies_parameter_passed: 'No ontologies parameter passed. Syntax: ?ontologies=ONT1,ONT2,...,ONTN'
+    no_record_exists: No record exists for ontology %{acronym}
+    no_reset_command: The UI cache does not respond to the 'reset' command
+    ontologies_report_retrieved: Ontologies Report - retrieved %{ontologies} ontologies
+      in %{time}s"
+    ontology_not_found: Ontology %{ont} was not found
+    ontology_not_found_system: Ontology %{ont} was not found,
+    ontology_process_error: 'Problem %{error_keyword} ontology %{ont} - %{class}:
+      %{message},'
+    ontology_process_success: Ontology %{ont} %{success_keyword} successfully,
+    parse_log:
+      log_file: 'Log file: %{path}'
+      title: Parse log for %{acronym}
+    problem_deleting_submission: 'Problem deleting submission %{id} for ontology %{ont}
+      - %{class}: %{message}'
+    problem_refreshing_report: 'Problem refreshing report - %{class}: %{message}'
+    problem_retrieving_ontologies: Problem retrieving ontologies report - %{message}
+    query_not_permitted: Query not permitted
+    refresh_report_with_ontologies: 'Refresh of report for ontologies: %{ontologies}
+      started successfully'
+    refresh_report_without_ontologies: Refresh of ontologies report started successfully
+    report_successfully_regenerated: Report successfully regenerated on %{report_date_generated}
     search:
       index:
         index_data: INDEX DATA
@@ -287,14 +346,33 @@ en:
         show_more: "+ Show more ..."
     site_administration:
       cache_management: Cache management
+      cache_management_description:
+        Flush the caches %{portal_name} relies on to serve pages, or reset the connection to the cache server.
       checking_for_updates: Checking for updates ...
       clear_cache: Flush UI cache
       clear_goo_cache: Flush GOO cache
       clear_http_cache: Flush HTTP cache
-      flipper_description: Use Flipper to control the visibility of specific %{portal_name} features within the user interface.
+      edit_federated_portals: Edit federated portals
+      federated_portals: Federated portals
+      federated_portals_description:
+        Choose the OntoPortal instances %{portal_name} federates with, and provide the API key of the federation user of each of them.
+      flipper_description:
+        Use Flipper to control the visibility of specific %{portal_name} features within the user interface.
+      flipper_ui: Flipper UI
+      no_federated_portal: No portal federated yet.
+      sidekiq_description:
+        Use Sidekiq to monitor and manage background job processing, queues, and cron jobs.
+      sidekiq_ui: Sidekiq UI
       reset_cache: Reset UI cache connection
       settings: Settings
       version_management: Version management
+      version_management_description:
+        The OntoPortal version %{portal_name} runs, and the updates available for it.
+    submission_deleted_successfully: Submission %{id} for ontology %{ont} was deleted
+      successfully
+    submission_not_found: Submission %{id} for ontology %{ont} was not found
+    turbo_confirm: Are you sure you want to %{name}?
+    update_info_successfully: Update information successfully retrieved
   agents:
     add_agent: New agent added successfully
     edit_agent: Edit agent
@@ -317,13 +395,17 @@ en:
       identifiers: Identifiers
       identifier: Identifier
       name: Name
+      name_placeholder: Lookup the ROR registry or create a new organization
       organization: Organization
       person: Person
       type: Type
     index:
       acronym: Acronym
       actions: Actions
+      added: Added
+      added_by: by %{user}
       create_new_agent: Create agent
+      date_unknown: date unknown
       first_name: First name
       no_agents: There are currently no  agents.
       usages: Usages
@@ -387,9 +469,13 @@ en:
     submit: Submit
     type: Type
   check_resolvability:
-    check_resolvability_message_1: 'The URL is resolvable and support the following formats: %{supported_format}'
-    check_resolvability_message_2: 'The URL is resolvable but is not content negotiable, it supports only: %{supported_format}'
-    check_resolvability_message_3: The URL is not resolvable and not content negotiable (it returns %{status}).
+    blocked: Blocked URL
+    check_resolvability_message_1: 'The URL is resolvable and support the following
+      formats: %{supported_format}'
+    check_resolvability_message_2: 'The URL is resolvable but is not content negotiable,
+      it supports only: %{supported_format}'
+    check_resolvability_message_3: The URL is not resolvable and not content negotiable
+      (it returns %{status}).
     content_negotiation:
       content: Content negotiation in the context of the Semantic Web refers to the mechanism by which two communicating parties, such as a client and a server, agree on the most suitable representation of a resource during the process of dereferencing a URI or IRI. In other words, when a client requests a resource by dereferencing a URI, it indicates its preferences for the format of the response data through HTTP headers or other negotiation mechanisms. The server, in turn, examines these preferences and selects the most appropriate representation of the resource based on what is available.
       title: Content negotiation
@@ -418,12 +504,17 @@ en:
     preferred_name: Preferred name
     type: Type
   components:
+    add_another_object: "Add another %{object_name}"
+    class: "class"
+    contact: "contact"
+    portal: "portal"
     all_languages: All languages
     back: Back
     by: by
     cancel_button: Cancel
     check_resolvability: checking resolvability...
     classes: classes
+    close: Close
     concepts: concepts
     copy_original_uri: Copy original URI
     copy_portal_uri: Copy %{portal_name} URI
@@ -506,6 +597,13 @@ en:
     title: Manage Cookie Consent
     paragraph3: Please note that disabling such cookies may affect your browsing experience.
     deny_button: Deny
+  date:
+    formats:
+      month_day_year: "%b %-d, %Y"
+      monthfull_day_year: "%B %-d, %Y"
+      year_month_day_concise: "%Y-%m-%d"
+  definitions:
+    raw_data: Show this definition's source, dates and raw data
   errors:
     error_message: We're sorry but something has gone wrong.
     go_home_button: Go home
@@ -514,6 +612,13 @@ en:
     send_feedback_button: Send a feedback
   fair_score:
     fairness_unreachable_warning: FAIRness assessment service unreachable
+    foops_unreachable_warning: FOOPS! assessment service unreachable
+    foops_description: 'FAIRness assessment score computed with the FOOPS! tool (Ontology
+      Pitfall Scanner for FAIR) based on the file loaded in the portal. More details
+      here: https://foops.linkeddata.es/'
+    description: 'The FAIR score evaluates how well this ontology follows the FAIR
+      principles (Findable, Accessible, Interoperable, Reusable). Two complementary
+      assessments are available: O''FAIRe and FOOPS!'
     go_to_api: Go to API
     metadata_properties: Metadata properties listed in the following are picked from %{mod_link}.
     mod_link: MOD1.4
@@ -523,7 +628,9 @@ en:
     see_metadata_used_properties: See metadata used properties
     see_possible_credits: See possible credits
     see_the_used_properties: see the used properties
-    view_fair_scores_definitions: 'You are seeing the FAIRness assessment score for this ontology in AgroPortal. FAIR scores are computed with the O''FAIRe methodology. More details here: https://github.com/agroportal/fairness'
+    view_fair_scores_definitions: 'FAIRness assessment score computed with the O''FAIRe
+      methodology (Ontology FAIRness Evaluator) based on the local metadata record.
+      More details here: https://github.com/agroportal/fairness'
   federation:
     check_status: Checking %{portal} availability
     not_responding: is not responding.
@@ -830,46 +937,209 @@ en:
       mapping_comment: Comment
       mapping_relation: Mapping relation type
       save: Save
-    mapping_table:
-      mapping_to: Mapping to
-      relations: Relations
-      source: Source
-      type: Type
-      actions: Actions
-      no_mappings: There are currently no  mappings for this class.
-    mapping_type_selector:
-      mapping_type: Mapping type
-      internal: Internal
-      interportal: InterPortal
-      external: External
-      target_class: Target class
-      details: Details
-      ontology_acronym: Semantic resource (acronym)
-      class: Class
-      ontology_acronym_placeholder: Enter the semantic resource ACRONYM
-      class_uri_placeholder: Enter the class URI
-      ontology_uri_placeholder: Enter the semantic resource URI
-    show_line:
-      edit_modal: Edit
-      delete_button: Delete
-      turbo_confirm: Are you sure?
-      edit_mapping: Edit mapping for %{preflabel}
-    show:
-      no_mappings_found: No mappings found
-    bulk_loader:
-      loader:
-        example_of_valid_file: See an example of a valid a file
-        save: Save
-      loaded_mappings:
-        mappings_created: "%{size} mappings created successfully"
-        id: Id
-        source: Source
-        target: Target
-        relation: Relation
-        properties: Properties
-        actions: Actions
-        see_other_properties: See other properties
-  ontology_details:
+      subject: Subject
+    new_comment_added: New comment added successfully
+    new_proposal:
+      class_id: Class ID
+      definition: Definition
+      label: Label
+      new_target: New target
+      new_value: New value
+      old_target: Old target
+      old_value: Old value
+      parent: Parent
+      property_id: Property ID
+      reason_for_change: Reason for change
+      relationship_type: Relationship type
+      save: save
+      synonym: Synonym
+    new_relationship_proposal: New relationship proposal
+    no_notes: No notes to display
+    note_deleted_successfully: Note %{note_id}  was deleted successfully
+    note_line:
+      alert_text: Are you sure you want to delete the note <span style='color:red;font-weight:bold;'>
+        ''%{subject}''</span> created by <span style='color:red;font-weight:bold;'>%{creator}</span>?<br/><b>This
+        action CAN NOT be undone!!!</b>
+      archived: archived
+      comment: Comment
+      delete: Delete
+    note_not_found: Note %{note_id}  was not found in the system
+    reply:
+      about_note_decorator: about %{note_decorator}
+      cancel: Cancel
+      comment: Comment
+      save: save
+    thread:
+      submitted_by: submitted by
+  ontolobridge:
+    error_saving_new_term_instructions: Unable to save new term instructions for %{acronym}
+      due to a server error
+    new_term_instructions_saved: New term request instructions for %{acronym} saved
+    problem_of_creating_new_term: 'Problem creating a new term %{endpoint}: %{class}
+      - %{message}'
+  ontologies:
+    access_rights_information: Additional license and access rights information
+    admin:
+      title: "Administration"
+      submissions:
+        title: "Submissions"
+        table:
+          select: "Select"
+          submission_id: "Submission ID"
+          release_date: "Release Date"
+          status: "Status"
+          actions: "Actions"
+        delete: "Delete"
+        confirm_delete: "Are you sure you want to delete the submission %{submission_id} ?"
+        delete_selected: "Delete Selected"
+        confirm_delete_selected: "Are you sure you want to delete selected submissions?"
+        select_at_least_one: "Please select at least one submission to delete."
+        submission_deleted: "Submission %{submission_id} deleted"
+        submissions_deleted: "Submissions queued for deletion: %{submission_ids}"
+        error_deleting_submissions: "Error deleting submissions: %{message}"
+        loading: "Loading submissions..."
+      log:
+        title: "Processing logs"
+        loading: "Loading log..."
+        no_log: "No log available."
+        parse_error: "Error parsing log: %{message}"
+      ontology:
+        title: "Ontology"
+        warning: "Warning: Deleting the ontology is irreversible. All submissions and metadata will be lost."
+        delete: "Delete Ontology"
+        confirm_delete: "Are you sure you want to delete the ENTIRE ontology? This cannot be undone."
+    add_new_submission: Add new submission
+    admin_links: Administration links
+    administrator: 'Administrator:'
+    allow_users: Allow users to view the metadata of your ontology (Summary) only.
+    browser:
+      admin_welcome: Welcome admin,this coloring indicates admin-only features
+      search_placeholder: Filter ontologies, e.g., AGROVOC, plant
+      show_my_ontologies: Show my ontologies only
+      show_ontology_views: Show ontology views
+      show_public_ontology: Show public ontology only
+      show_private_ontology: Show private ontology only
+      show_retired_ontologies: Show retired ontologies only
+    user_ontologies:
+      no_ontology_found: "Ready to contribute?\n Submit your first ontology and start building your collection."
+
+    taxonomy_information_tooltip: See more information about %{taxonomy_type} in
+    categories: Categories
+    change_notes: Change notes
+    collapse_all: Collapse All
+    collecting_data: We are still collecting data for %{acronym}
+    collecting_data_message: We are still collecting data for %{acronym}
+    concepts_browsers:
+      filter: Filter
+      label_jump: 'Jump to:'
+      missing_roots: Missing roots for %{acronym} (skos:topConceptOf)
+      placeholder_jump: Jump to
+      select_collection: Please select a collection to display
+      select_scheme: Please select a scheme to display
+    contact_support: Contact support
+    contact_support_at: 'If you have any questions or problems, please email the %{site}
+      support team at:'
+    create_new_project: Create new project
+    create_new_view: Create new view
+    create_new_view_submission: Create new view submission
+    created_by: 'Created by:'
+    date_of_original_creation: Date of original creation
+    dates_and_contacts: Dates and contacts
+    definition: 'Definition:'
+    description: 'Description:'
+    details: Details
+    downloads: Downloads
+    edit_available_languages: Click here to edit available languages
+    edit_link: Edit
+    edit_metadata: Edit metadata
+    edit_natural_languages: Edit natural languages of %{acronym}
+    expand_all: Expand All
+    exploring_and_searching: 'in our ontology list but they cannot explore or search
+      it. To enable exploring and searching, please upload a full version of your
+      ontology.
+
+      '
+    fairness_assessment_questions_ofaire: O'FAIRe FAIRness assessment questions
+    fairness_assessment_questions_foops: FOOPS! FAIRness assessment questions
+    filters: Filters
+    formality_levels: Formality levels
+    general_information: General information
+    go_to_api: Go to API
+    groups: Groups
+    home_page: Home Page
+    htaccess_modal_title: Rewrite rules for %{acronym} ontology
+    htaccess_redirection:
+      instruction_1: 'Access .htaccess File:'
+      instruction_1_content: Locate the .htaccess file in the root directory of your
+        website, if it doesn't exist create one. This file controls how your web server
+        behaves and is often used for URL rewriting and redirection.
+      instruction_2: 'Copy and Paste Redirect Rules in the .htaccess file:'
+      instruction_2_content: Copy the rewrite rules provided in the black rectangle.
+        Open the .htaccess file and paste the copied redirect rules into the file
+      instruction_3: 'Enable rewrite module (Linux):'
+      instruction_3_content: you'll need to ensure that the Apache module called 'rewrite'
+        is enabled by running the command `sudo a2enmod rewrite`
+    htaccess_redirection_description: We offer a seamless solution to make your ontology
+      URIs resolvable and content negotiable by allowing URL redirection for your
+      ontology URIs to our Agroportal URIs. To facilitate this process, we've provided
+      you with a set of .htaccess rewrite rules. By following the simple instructions
+      below, you'll be able to implement these rules swiftly and efficiently, ensuring
+      smooth redirection
+    instructions_servers: Instructions for %{server} servers
+    load_from_url: Load from URL
+    location: Location
+    metadata_only: Metadata only (No file)
+    metadata_properties: of %{acronym}  metadata properties are filled
+    modification_date: Modification date
+    natural_languages: Natural languages
+    new_ontology_is_processing: The ontology is processing. Sections such as %{ontology}
+      will be available  once processing is complete.
+    new_versions_loaded: New submission loaded on a nightly basis.
+    nginx_redirection:
+      instruction_1: 'Access Nginx configuration file:'
+      instruction_1_content: The location of this file can vary depending on your
+        system, but common locations include /etc/nginx/nginx.conf, /etc/nginx/sites-available/default
+        or /usr/local/etc/nginx/nginx.conf.
+      instruction_2: 'Locate the server block or location block where you want to
+        enable URL rewriting:'
+      instruction_2_content: This is typically within the server { ... } block.
+      instruction_3: 'Copy and Paste Redirect Rules :'
+      instruction_3_content: Copy the rewrite rules provided in the black rectangle.
+        Inside the appropriate block, add the copied rules to enable URL rewriting
+      instruction_4: 'Test the configuration for syntax errors:'
+      instruction_4_content: Run the following command to test the redirection configuration
+        `sudo nginx -t`
+      instruction_5: 'Reload Nginx to apply the changes:'
+      instruction_5_content: Restart the nginx server to apply the redirection using
+        this command `sudo systemctl reload nginx`
+    no_license: No license
+    no_projects_using_ontology: No projects using %{acronym}
+    no_views: No views available for %{acronym}.
+    notification_message: 'When your ontology is ready for viewing, you will receive
+      an email notification and it will be available here:'
+    ontology_is_processing: The ontology is processing. Sections such as %{ontology}
+      will be updated once processing is complete.
+    ontology_parsing_succeeded: 'The ontology parsing succeeded, but some processing
+      steps failed, here are the current statuses: %{status}'
+    ontology_processing_failed: 'The ontology processing failed, with the current
+      statuses: %{status}'
+    ontology_search_prompt: Search an ontology or a term (e.g., plant height)
+    class_search_prompt: Search a class (e.g., plant height)
+    ontology_submitted: Ontology submitted successfully!
+    ontology_types: Ontology types
+    outside: outside
+    private_ontology: Private ontology
+    processing_message: |
+      We will now put your ontology in the queue to be processed. Please keep in mind that it may take up to several
+      hours before %{site} users will be able to explore and search your ontology.
+    projects_using_ontology: Projects using %{acronym}
+    redirection_note: |-
+      This redirection works only for uri with the form of: url/path/resource_id
+      This will not work for uris in the form of: url/path/to/something#resource_id OR url/path/to/something:resource_id
+    referred_to: It can also be referred to as
+    relation_with_other_ontologies: Relation with other ontologies either in %{inside}
+      or %{outside}
+    release_date: Release date
     sections:
       add_acronym_widgets: Add %{acronym} Web Widgets to your site
       additional_parameters: Additional parameters are documented on the
@@ -959,6 +1229,7 @@ en:
       scroll_down_to_see_more: Scroll down to see more
       set_the_variable: 'You can set the variable to ''all'' to search all ontologies in %{site}:'
       shortid: shortid
+      submissions: Submissions
       uri: uri
       use_all_to_search: 'use ''all'' to search across all %{site} ontologies:'
       use_following_parameters: 'You can use the following parameters to select which value will be placed into the user-visible input field:'
@@ -986,6 +1257,7 @@ en:
       sparql: SPARQL
       summary: Summary
     see_details: See details
+    self: Ontologies
     showing: Showing
     showing_ontologies_user_size: Showing %{ontologies_size} of %{analytics_size} ontology in %{time}s
     showing_ontologies_size: Showing %{ontologies_size} of %{analytics_size} from %{portals}
@@ -1042,6 +1314,34 @@ en:
       natural_languages: Natural languages
       ontology_types: Ontology types
     unselect_all: Unselect all
+  ontology_details:
+    concept:
+      definitions: Definitions
+      id: ID
+      in_schemes: In schemes
+      member_of: Member of
+      no_preferred_name_for_selected_language: No preferred name for selected language.
+      obsolete: Obsolete
+      preferred_name: Preferred name
+      show_all_synonyms: Show all synonyms
+      synonyms: Synonyms
+      type: Type
+    header:
+      last_submission_date: Last submission date
+    metadata:
+      additional_metadata: Additional Metadata
+    sections:
+      classes: Classes
+      collections: Collections
+      concepts: Concepts
+      instances: Instances
+      mappings: Mappings
+      notes: Notes
+      properties: Properties
+      schemes: Schemes
+      sparql: SPARQL
+      summary: Summary
+      widgets: Widgets
   ontoportal_virtual_appliance:
     admin_add_users:
       accounts_with_access: Accounts with access
@@ -1180,6 +1480,10 @@ en:
     preferred_name: Preferred name
     type: Type
   search:
+    autocomplete:
+      agents: Agents
+      concepts: Concepts
+      ontologies: Ontologies
     advanced_options:
       include_in_search_title: Include in search
       include_in_search_values:
@@ -1205,15 +1509,34 @@ en:
     search_place_holder: Enter a term, e.g., plant height
     show_advanced_options: Show options
   show_advanced_options: Show advanced options
+  statistics:
+    agents: Agents
+    date: Date
+    description: "Evolution of resources in %{portal} through numbers (last %{last_years} years)."
+    lead: "(last %{last_years} years)"
+    menu: Statistics
+    ontologies: Ontologies
+    ontology_visits: Ontology visits
+    projects: Projects
+    this_month: this month
+    title: "%{portal} Statistics"
+    users: Users
   submission_inputs:
-    accounts_allowed: Add or remove accounts that are allowed to see this ontology in %{portal_name}.
+    name: Name
+    acronym: Acronym
+    categories: Categories
+    accounts_allowed: Add or remove accounts that are allowed to see this ontology
+      in %{portal_name}.
     administrators: Administrators
     contact: Contact
-    contact_email: "%{name} Email"
-    contact_name: "%{name} Name"
-    deprecated_help: An ontology with status <strong>retired</strong> shall necessarily be also <strong>deprecated</strong>, but not the opposite.
-    edit_metadata_instruction: Edit the metadata of your ontology here. Some of these values are used by %{portal_name} functionalities, including for FAIRness assessment. %{link)
-    edit_metadata_instruction_link: See guidelines and recommendations for metadata here.
+    contact_email: "%{name} email"
+    contact_name: "%{name} name"
+    deprecated_help: An ontology with status retired shall necessarily be also deprecated, but not the opposite.
+    edit_metadata_instruction: Edit the metadata of your ontology here. Some of these
+      values are used by %{portal_name} functionalities, including for FAIRness assessment.
+      %{link)
+    edit_metadata_instruction_link: See guidelines and recommendations for metadata
+      here.
     edit_ontology_title: Edit ontology
     equivalents: Equivalents
     groups: Groups
@@ -1241,13 +1564,21 @@ en:
 
       '
     ontology_umls_language_link: by the UMLS2RDF tool.
+    ontology_xlsx_language_help: 'Crop Ontology Template (TDv5). The file must contain a sheet named "Template for submission" with Variable, Trait, Method, and Scale columns. The uploaded TDv5 template will be automatically converted to OWL by %{portal_name}.'
     ontology_view_of_another_ontology: Is this ontology a view of another ontology?
     validators: Validators
     version_help: For more information on how to encode versioning information in an ontology, see %{link}
     version_helper_link: guidelines and recommendations.
     visibility: Visibility
+    view_of: View of
+    sample_queries: Sample queries
+    subjects: Subjects
     theme_taxonomy_not_set: Please set the themeTaxonomy field in the admin page to use it for subjects search
-    subjects_notice: 'The ''Subjects'' must be selected from the following set of ontologies: %{ontologies}. If you wish to add another keyword or controlled term, use the ''Keywords'' property.'
+    subjects_notice: "The 'Subjects' must be selected from the following set of ontologies: %{ontologies}. If you wish to add another keyword or controlled term, use the 'Keywords' property."
+    description: 'Description'
+    status: 'Status'
+    valid: 'Valid date'
+    hasOntologyLanguage: 'Representation language'
   submissions:
     actions: Actions
     delete_submission_alert:
@@ -1255,6 +1586,7 @@ en:
       content_2: "</span> for ontology <span style='color:red;font-weight:bold;'>"
       content_3: "</span>?<br/><b>This action CAN NOT be undone!!!</b>"
     download: Download
+    download_metadata: Metadata
     edit_button: Edit
     filter:
       all_formats: Formats
@@ -1273,6 +1605,7 @@ en:
     modified: Modified
     no_submissions_for_ontology: 'No submissions for ontology: %{ontology}'
     save_button: Save
+    submission: Submission
     submission_updated_successfully: Submission updated successfully
     submitted: Submitted
     toggle_dropdown: Toggle dropdown

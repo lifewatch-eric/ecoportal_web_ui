@@ -224,6 +224,7 @@ class OntologiesController < ApplicationController
   end
 
   def sparql
+    @sparql_submission = latest_rdf_submission(@ontology) || @submission_latest
     if request.xhr?
       render partial: 'ontologies/sections/sparql', layout: false
     else
@@ -292,8 +293,8 @@ class OntologiesController < ApplicationController
 
 
     unless helpers.submission_ready?(@submission_latest)
-      submissions = @ontology.explore.submissions(include: 'submissionId,submissionStatus')
-      if submissions.any?{|x| helpers.submission_ready?(x)}
+      @ontology_submissions = @ontology.explore.submissions(include: 'submissionId,submissionStatus')
+      if @ontology_submissions.any?{|x| helpers.submission_ready?(x)}
         @old_submission_ready = true
       elsif !params[:p].blank?
         params[:p] = "summary"
@@ -347,9 +348,12 @@ class OntologiesController < ApplicationController
     @projects = @ontology.explore.projects.sort { |a, b| a.name.downcase <=> b.name.downcase } || []
     @analytics = LinkedData::Client::HTTP.get(@ontology.links['analytics'])
 
-    # Call to fairness assessment service
+    # O'FAIRe (declarative) fairness score
     tmp = fairness_service_enabled? ? get_fair_score(@ontology.acronym) : nil
     @fair_scores_data = create_fair_scores_data(tmp.values.first) unless tmp.nil?
+
+    # FOOPS! (technical) fairness score — loaded asynchronously by foops_score_summary_controller.js
+    # No synchronous call here to avoid blocking the page
 
     @views = get_views(@ontology)
     @view_decorators = @views.map { |view| ViewDecorator.new(view, view_context) }
@@ -382,7 +386,6 @@ class OntologiesController < ApplicationController
                             %w[summary/homepage homepage],
                             %w[summary/documentation documentation],
                             %w[icons/github repository],
-                            %w[summary/sparql endpoint],
                             %w[icons/publication publication],
                             %w[icons/searching_database openSearchDescription]
     ]
@@ -585,6 +588,17 @@ class OntologiesController < ApplicationController
     return {} if sub.nil?
 
     properties.map { |x| [x.to_s, [sub.send(x.to_s), custom_labels[x.to_sym]]] }.to_h
+  end
+
+  def latest_rdf_submission(ontology)
+    return @submission_latest if helpers.submission_ready?(@submission_latest)
+
+    submissions = @ontology_submissions || ontology.explore.submissions(include: 'submissionId,submissionStatus') || []
+    submissions
+      .select { |s| Array(s.submissionStatus).include?('RDF') }
+      .max_by { |s| s.submissionId.to_i }
+  rescue StandardError
+    nil
   end
 
 

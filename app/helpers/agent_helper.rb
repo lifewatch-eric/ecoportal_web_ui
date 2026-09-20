@@ -83,7 +83,7 @@ module AgentHelper
   end
 
 
-  def agent_identifier_input(index, name_prefix, value = '', is_organization: true)
+  def agent_identifier_input(index, name_prefix, value = '', is_organization: true, input_data: nil)
 
     content_tag :div, id: index, class: 'd-flex' do
       content_tag(:div, class: 'w-100') do
@@ -94,35 +94,37 @@ module AgentHelper
         else
           concat inline_svg_tag('orcid.svg', class: 'agent-input-icon')
         end
-        concat text_field_tag(agent_identifier_name(index, :notation, name_prefix), value, class: 'agent-input-with-icon')
+        notation_options = { class: 'agent-input-with-icon' }
+        notation_options[:data] = input_data if input_data
+        concat text_field_tag(agent_identifier_name(index, :notation, name_prefix), value, notation_options)
       end
     end
   end
 
 
   def display_identifiers(identifiers, link: true, icon: true)
-    schemes_urls = { 
-      ORCID: 'https://orcid.org/', 
-      ISNI: 'https://isni.org/', 
-      ROR: 'https://ror.org/', 
-      GRID: 'https://www.grid.ac/' 
+    schemes_urls = {
+      ORCID: 'https://orcid.org/',
+      ISNI: 'https://isni.org/',
+      ROR: 'https://ror.org/',
+      GRID: 'https://www.grid.ac/'
     }
-    
+
     schemes_icons = {
       ORCID: 'orcid.svg',
       ROR: 'ror.svg',
     }
-    
+
     Array(identifiers).map do |i|
       if i["schemaAgency"]
         schema_agency, notation = [i["schemaAgency"], i["notation"]]
       else
         schema_agency, notation = (i["id"] || i["@id"])&.split('Identifiers/')&.last&.delete(' ')&.split(':') || [nil, nil]
       end
-      
+
       value = "#{schemes_urls[schema_agency.to_sym]}#{notation}"
       icon_path = schemes_icons[schema_agency.to_sym]
-      
+
       if icon && icon_path
         content = inline_svg_tag("icons/#{icon_path}", class: 'identifier-icon')
       else
@@ -140,17 +142,15 @@ module AgentHelper
       end
     end.join(' ').html_safe
   end
-  
+
   def render_agent_partial(partial, agent)
     render_to_string(partial: partial, locals: { agent: agent })
   end
 
   def agents_rest_url(page = 1, pagesize = 10, display = nil)
-    url = rest_url + agents_path + "?page=#{page}&pagesize=#{pagesize}" + (display ? "&display=#{display}" : '')
-    url += "&apikey=#{get_apikey}" unless session[:user].nil?
-    url
+    rest_url + agents_path + "?page=#{page}&pagesize=#{pagesize}" + (display ? "&display=#{display}" : '')
   end
-  
+
   def agent_field_name(name, name_prefix = '')
     name_prefix&.empty? ? name : "#{name_prefix}[#{name}]"
   end
@@ -176,6 +176,20 @@ module AgentHelper
   def agent_usages_count(agent = @agent)
     usages = agent_usages(agent)
     usages.values.flatten.size
+  end
+
+  def agent_created_at(agent)
+    DateTime.parse(agent.created) if agent.created.present?
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def agent_created_sort_key(agent)
+    agent_created_at(agent)&.strftime('%Y%m%d%H%M%S') || '0' * 14
+  end
+
+  def agent_creator_username(agent)
+    agent.creator.to_s.split('/').last.presence
   end
 
   def agents_metadata
@@ -241,7 +255,7 @@ module AgentHelper
         horizontal_list_container(agent.usages) do |sub|
           acronym = sub.to_s.sub(/\/submissions\/\d+$/, "").split(/[\/\s]/).last
           render ChipButtonComponent.new(text: acronym, type: "clickable")
-        end 
+        end
       end
     end
   end
@@ -277,12 +291,13 @@ module AgentHelper
     if agent.is_a?(String)
       name = agent
       title = nil
+      agent_page_url = nil
     else
       name = agent.agentType.eql?("organization") ? (agent.acronym.presence || agent.name) : agent.name
       agent_icon = agent.agentType.eql?("organization") ? organization_icon : person_icon
       title = agent_tooltip(agent)
+      agent_page_url = agent.id.to_s.include?('/Agents/') ? agents_path + "/#{agent.id.split('/').last}" : nil
     end
-    agent_page_url = agent.id.include?('/Agents/') ? agents_path + "/#{agent.id.split('/').last}" : nil
     render_chip_component(title, agent_icon, name, agent_page_url, target)
   end
 
@@ -292,7 +307,7 @@ module AgentHelper
       content_tag(:div, agent_icon, class: 'agent-chip-circle') +
       content_tag(:div, name, class: 'agent-chip-name text-truncate')
     end
-  
+
     chip = render ChipButtonComponent.new(
       type: "static",
       'data-controller': 'tooltip',
@@ -313,7 +328,8 @@ module AgentHelper
   def agents_homepage_link(style: '', ontology: nil)
     custom_style = "font-size: 50px; line-height: 0.5; margin-left: 6px; margin-bottom: 6px; vertical-align: top; #{style}".strip
     ontology = ontology || 'all'
-    render IconWithTooltipComponent.new(icon: 'json.svg',link: agents_rest_url, target: '_blank', title: t('home.go_to_api'), size:'small', style: custom_style)  
+    link, target = api_button_link_and_target(agents_rest_url)
+    render IconWithTooltipComponent.new(icon: 'json.svg',link: link, target: target, title: t('home.go_to_api'), size:'small', style: custom_style)
   end
 
   def agents_create_button
@@ -351,7 +367,7 @@ module AgentHelper
         show_modal_size_value: "modal-xl"
       }
     ) do
-      render PillButtonComponent.new(text: "#{inline_svg_tag 'edit.svg'} #{t('agents.edit_agent')}".html_safe) 
+      render PillButtonComponent.new(text: "#{inline_svg_tag 'edit.svg'} #{t('agents.edit_agent')}".html_safe)
     end
   end
   def ontologies_browse_path

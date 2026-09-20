@@ -12,7 +12,9 @@
       serverSide: Boolean,
       ordering: Boolean,
       ajaxUrl: String,
-      columns: Array
+      columns: Array,
+      showAll: Boolean,
+      search: String
     }
 
     connect() {
@@ -25,7 +27,10 @@
           paging: this.pagingValue,
           ...(this.columnsValue?.length > 0 && { columns: this.columnsValue.map(name => ({ data: name })) }),
           info: false,
-          lengthMenu: [
+          lengthMenu: this.showAllValue ? [
+            [10, 25, 50, 100, -1],
+            [10, 25, 50, 100, 'All']
+          ] : [
             [10, 25, 50, 100],
             [10, 25, 50, 100]
           ],
@@ -51,7 +56,11 @@
           } : null,
           order: this.noinitsortValue ? [] : [[defaultSortColumn, 'desc']],
           search: {
-            return: true
+            return: true,
+            // Primes the filter box so a deep link like /agents?search=inrae
+            // lands pre-filtered. Server-side tables send it with the first
+            // ajax call, so no extra request is made.
+            search: this.searchValue
           },
           language: {
             search: '_INPUT_',
@@ -65,8 +74,9 @@
       const searchInput = document.querySelector(`#${table.id}_filter input`)
 
       if (searchInput) {
-        let lastSearchValue = ''
-      
+        // Seeded so that clearing a short pre-filled search still resets the table.
+        let lastSearchValue = this.searchValue || ''
+
         searchInput.addEventListener('input', () => {
           const value = searchInput.value
           // Check if the input value has changed and is at least 3 characters long

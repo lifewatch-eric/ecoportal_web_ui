@@ -15,11 +15,9 @@
         - @metadata_sel.each do |meta|
           - h.th do
             %div
+              - label = property_label(meta)
               - attr_metadata = attr_metadata(meta)
-              - if attr_metadata
-                %h6{style:'margin-top: 0.2rem'}=attr_label(meta, attr_metadata: attr_metadata)
-              - else
-                %h6{style:'margin-top: 0.2rem'}=meta
+              %h6{style:'margin-top: 0.2rem'}=attr_label(meta, label, attr_metadata: attr_metadata)
 
       - @hash.each do |acronym, data|
         - ontology = data[:ontology]
@@ -30,7 +28,9 @@
           %tr{id: id+'_row'}
             %th{scope:"row", style: 'width: 5%'}
               %div
-                %h6{style:'margin-top: 0.2rem'}=id
+                %h6{style:'margin-top: 0.2rem'}
+                  = link_to(acronym, "/ontologies/#{acronym}", target: "_blank")
+                  = "##{submission_id}"
             - @metadata_sel.each do |meta|
               %td{style: "width: #{95 / @metadata_sel.size}%; vertical-align: top; word-break: break-word;"}
                 = render partial: "ontologies_metadata_curator/attribute", locals: { attribute: meta, submission: submission , ontology: ontology}

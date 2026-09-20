@@ -2,7 +2,8 @@
   .d-flex.justify-content-between
     = render PageHeaderComponent.new(title: "Agents" , description: t('agents.description', portalName: $SITE))
     .d-flex.align-items-center
-      = render RoundedButtonComponent.new(link: agents_rest_url, target: '_blank', size: 'medium', title: t("components.go_to_api"))
+      - link, target = api_button_link_and_target(agents_rest_url)
+      = render RoundedButtonComponent.new(link: link, target: target, size: 'medium', title: t("components.go_to_api"))
       - if session[:user]
         .span.m-2
         = agents_create_button
@@ -10,7 +11,7 @@
   - columns_names = ['name', 'acronym', 'affiliations', 'usages']
   - if session[:user] && session[:user].admin?
     - columns_names << 'actions'
-  = render TableComponent.new(id: 'agents-table', borderless: true, outline: true, paging: true, searching: true, sort_column: '0', server_side: true, ajax_url: '/ajax/agents/list', search_placeholder: t('agents.index.search_placeholder'), columns: columns_names, ordering: false) do |t|
+  = render TableComponent.new(id: 'agents-table', borderless: true, outline: true, paging: true, searching: true, sort_column: '0', server_side: true, ajax_url: '/ajax/agents/list', search_placeholder: t('agents.index.search_placeholder'), columns: columns_names, ordering: false, search: @search) do |t|
     - t.header do |h|
       - h.th {t("agents.form.name")}
       - h.th {t("agents.form.acronym")}

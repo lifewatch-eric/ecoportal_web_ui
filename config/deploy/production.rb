@@ -1,5 +1,5 @@
-set :branch, 'master'
-set :server, 'ecoportal.lifewatch.eu'
+set :branch, ENV.fetch('BRANCH', 'ecoportal-v3.6.0.1')
+set :server, ENV.fetch('SERVER', 'ecoportal-prod-new')
 
 server fetch(:server), user: fetch(:user), roles: %w{web app}
 

@@ -95,12 +95,17 @@ gem 'string-similarity'
 gem 'inline_svg'
 
 # ISO language codes and flags
-gem 'countries', '~> 5.7'
 gem 'flag-icons-rails', '~> 3.4'
 gem 'iso-639', '~> 0.3.6'
+gem 'countries', '~> 5.7'
 
 # Custom API client
-gem 'ontologies_api_client', git: 'https://github.com/lifewatch-eric/ontologies_api_ruby_client.git', branch: 'master'
+gem 'ontologies_api_client', git: 'https://github.com/agroportal/ontologies_api_ruby_client.git', branch: 'development'
+
+# SSRF protection for the URI resolvability checker
+gem 'ssrf_filter', '~> 1.5'
+
+# Ruby 2.7.8 pinned gems (to remove when migrating to Ruby >= 3.0)
 
 gem 'ffi', '~> 1.16.3'
 gem 'net-ftp', '~> 0.2.0', require: false
@@ -108,14 +113,14 @@ gem 'net-http', '~> 0.3.2'
 
 # Multi-Provider Authentication
 gem 'omniauth'
+gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
 gem 'omniauth-google-oauth2'
-gem 'omniauth-keycloak', '~> 1.4'
+gem 'omniauth-keycloak'
 gem 'omniauth-orcid'
-gem 'omniauth-rails_csrf_protection', '~> 1.0', '>= 1.0.1'
 
 # Used to generate colors randomly
-gem 'color', '~> 1.8'
+gem "color", "~> 1.8"
 
 group :staging, :production, :appliance do
   # Monitoring and performance profiling
@@ -155,9 +160,9 @@ group :development do
 
   # Internationalization tasks
   # gem 'i18n-debug'
-  gem 'deepl-rb'
   gem 'i18n-tasks'
   gem 'i18n-tasks-csv', '~> 1.1'
+  gem 'deepl-rb'
 
   # Email preview in the browser
   gem 'letter_opener_web', '~> 2.0'
@@ -182,8 +187,13 @@ group :test do
   gem 'rspec-rails'
 end
 
-gem 'openid_connect', '~> 2.2.0'
+gem 'concurrent-ruby', '1.3.4'
+
+# pinned gems for Centos 7 to remove when no more needed
+gem 'nokogiri', '~> 1.13.10'
+gem 'rexml'
 gem "sparql", "~> 3.3"
+
 # Feature flipping
 gem 'flipper'
 gem 'flipper-ui'

@@ -86,11 +86,11 @@ class SearchController < ApplicationController
       # Columns: synonym
       json << "|#{(result.synonym || []).join(";")}"
       if params[:id] && params[:id].split(",").length == 1
-        json << "|#{CGI.escape((result.definition || []).join(". "))}#{separator}"
+        json << "|#{CGI.escape(definition_text(result.definition))}#{separator}"
       else
         json << "|#{acronym}"
         json << "|#{acronym}"
-        json << "|#{CGI.escape((result.definition || []).join(". "))}#{separator}"
+        json << "|#{CGI.escape(definition_text(result.definition))}#{separator}"
       end
 
       # Obsolete results go at the end
@@ -114,6 +114,43 @@ class SearchController < ApplicationController
     render plain: response, content_type: content_type
   end
 
+  def json_ontology_classes_search
+    acronym = params[:ontology_acronym]
+    query = params[:search].to_s
+    page_size = (params[:page_size] || 25).to_i
+
+    if acronym.blank? || query.blank?
+      render json: []
+      return
+    end
+
+    query = "#{query.strip}*" unless query.end_with?('*')
+
+    search_page = LinkedData::Client::Models::Class.search(query, {
+      ontologies: acronym,
+      pagesize: page_size,
+      also_search_obsolete: false,
+      also_search_views: false,
+      include: 'prefLabel,synonym,definition'
+    })
+
+    results = Array(search_page&.collection).map do |cls|
+      ontology_link = cls.links && cls.links['ontology']
+      ontology_acronym = ontology_link ? ontology_link.split('/').last : acronym
+      label = main_language_label(cls.prefLabel) || cls.id
+
+      {
+        id: cls.id,
+        name: cls.id,
+        label: label,
+        acronym: ontology_acronym,
+        type: 'Class'
+      }
+    end
+
+    render json: results
+  end
+
   def json_ontology_content_search
     query = params[:search] || '*'
     page = (params[:page] || 1).to_i
@@ -130,10 +167,27 @@ class SearchController < ApplicationController
                                         filter_by_types: type,
                                         show_ontologies: show_ontologies)
 
+    results += search_agents_content(query: params[:search].to_s) if show_agents?
+
     render json: results
   end
 
   private
+
+  # Opt-in per call site: only the site-wide box (homepage and navbar) asks for
+  # agents. The ontology-scoped and subjects pickers share this endpoint and
+  # must keep returning ontology content alone.
+  def show_agents?
+    params[:show_agents].eql?('true') && helpers.agents_enabled?
+  end
+
+  # The definitions of a result as one line. A reified definition arrives as the
+  # URI of the node holding the text, and nothing is resolved here - the caller
+  # is an autocomplete answering while the user types - so a node is left out
+  # rather than pasted in as the sentence it is not.
+  def definition_text(definitions)
+    Array(definitions).reject { |value| link?(value) }.join('. ')
+  end
 
   def check_params_query(params)
     params[:q] = params[:q].strip
