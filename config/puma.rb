@@ -18,8 +18,13 @@ log_requests true
 
 if %w[production staging appliance].include?(rails_env)
 
-  # Define Puma socket (for Nginx)
-  bind "unix:///opt/ontoportal/ontoportal_web_ui/shared/tmp/sockets/puma.sock"
+  if rails_env == "appliance"
+    # The appliance Nginx configuration proxies to Puma over TCP.
+    port ENV.fetch("PORT") { 3000 }
+  else
+    # Define Puma socket (for Nginx)
+    bind "unix:///opt/ontoportal/ontoportal_web_ui/shared/tmp/sockets/puma.sock"
+  end
 
   # Specifies the number of `workers` to boot in clustered mode.
   # Workers are forked webserver processes. If using threads and workers together
