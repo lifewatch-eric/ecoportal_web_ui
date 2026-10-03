@@ -24,7 +24,12 @@ class HomeController < ApplicationController
 
     @anal_ont_names = []
     @anal_ont_numbers = []
-    unless @analytics.empty?
+    if @analytics.empty?
+      LinkedData::Client::Models::Metrics.all.sort_by { |metric| -(metric.classes.to_i + metric.individuals.to_i) }.first(3).each do |metric|
+        @anal_ont_names << metric.id.split('/')[-4]
+        @anal_ont_numbers << metric.classes.to_i + metric.individuals.to_i
+      end
+    else
       @analytics.first(3).each do |ont, count|
         @anal_ont_names << ont
         @anal_ont_numbers << count
@@ -78,6 +83,9 @@ class HomeController < ApplicationController
   def portal_config
     @config = portal_instance_config(params[:portal] || helpers.portal_name) || {}
     @portal_config = @config[:api].present? ? get_portal_config : {}
+    if @config[:name].to_s.casecmp?('EcoPortal')
+      @portal_config = @portal_config.merge(title: 'EcoPortal', description: t('home.index.tagline'))
+    end
     @color = @portal_config[:color].presence || @config[:color]
     @name = @portal_config[:title].presence || @config[:name]
   end

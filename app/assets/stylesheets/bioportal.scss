@@ -1074,6 +1074,7 @@ turbo-frame[busy] ~ .show-if-loading {
   grid-gap: 10px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px, rgba(0, 0, 0, 0.1) 0px 2px 4px;
   width: 526px;
+  max-width: calc(100vw - 60px);
   grid-row-gap: 10px;
 
   h4{

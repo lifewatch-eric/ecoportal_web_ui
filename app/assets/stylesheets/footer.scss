@@ -57,3 +57,12 @@ footer{
 .footer-nav-links div a:hover{
     opacity: 100%;
 }
+
+@media (max-width: 767px) {
+    footer {
+        width: 100%;
+        min-width: 0;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
