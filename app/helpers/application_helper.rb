@@ -536,18 +536,30 @@ module ApplicationHelper
 
   def append_apikey_if_rest_url(link, user = current_user)
     return link if link.blank?
-    rest_url = LinkedData::Client.settings.rest_url
-    fairness_url = $FAIRNESS_URL
-    if link.include?(rest_url) || (fairness_url.present? && link.include?(fairness_url))
-      uri = URI.parse(link) rescue nil
-      return link unless uri
-      params = URI.decode_www_form(uri.query || "")
-      params.reject! { |k, v| k == "apikey" }
-      params << ["apikey", get_apikey]
-      uri.query = URI.encode_www_form(params)
-      link = uri.to_s
+    uri = URI.parse(link) rescue nil
+    return link unless uri.is_a?(URI::HTTP) && uri.host.present?
+
+    service_link = [LinkedData::Client.settings.rest_url, $FAIRNESS_URL].compact.any? do |service_url|
+      service_uri = URI.parse(service_url) rescue nil
+      next false unless service_uri.is_a?(URI::HTTP)
+
+      default_ports = [uri, service_uri].all? { |url| url.port == url.default_port }
+      same_origin = uri.host.casecmp?(service_uri.host.to_s) &&
+                    ([uri.scheme, uri.port] == [service_uri.scheme, service_uri.port] || default_ports)
+      base_path = service_uri.path.to_s.chomp('/')
+      same_origin && (base_path.empty? || uri.path == base_path || uri.path.start_with?("#{base_path}/"))
     end
-    link
+    return link unless service_link
+
+    if uri.scheme == 'http' && uri.port == 80
+      uri.scheme = 'https'
+      uri.port = nil
+    end
+    params = URI.decode_www_form(uri.query || "")
+    params.reject! { |k, v| k == "apikey" }
+    params << ["apikey", get_apikey]
+    uri.query = URI.encode_www_form(params)
+    uri.to_s
   end
 
 end
