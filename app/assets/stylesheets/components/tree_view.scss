@@ -52,6 +52,10 @@ a.tree-link.active {
     margin-left: 2px;
 }
 }
+.simpleTree .hidden {
+  display: none !important;
+}
+
 .simpleTree li {
 list-style: none;
 margin:0;

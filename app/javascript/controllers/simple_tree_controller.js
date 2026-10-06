@@ -21,9 +21,9 @@ export default class extends Controller {
 
   toggleChildren (event) {
     event.preventDefault()
-    event.target.classList.toggle('fa-chevron-right')
-    event.target.classList.toggle('fa-chevron-down')
-    event.target.nextElementSibling.nextElementSibling.classList.toggle('hidden')
+    event.currentTarget.classList.toggle('fa-chevron-right')
+    event.currentTarget.classList.toggle('fa-chevron-down')
+    event.currentTarget.nextElementSibling.nextElementSibling.classList.toggle('hidden')
   }
 
   #centerTreeView() {
