@@ -6,7 +6,7 @@ class StatisticsController < ApplicationController
   def index
     cutoff_date = Date.parse('2019-12-31T23:59:59Z')
 
-    @merged_data, @year_month_visits = Rails.cache.fetch("statistics_index_data-#{$SITE}", expires_in: 24.hours) do
+    @merged_data, @year_month_visits = Rails.cache.fetch("statistics_index_data-#{$SITE}-from-2020", expires_in: 24.hours) do
       projects = LinkedData::Client::Models::Project.where({ include: 'created' }) { |project| project.created.to_date > cutoff_date }
       users = LinkedData::Client::Models::User.where({ include: 'created' }) { |user| user.created.to_date > cutoff_date }
       agents = LinkedData::Client::Models::Agent.where({ include: 'created' }) { |agent| agent.created.blank? || agent.created.to_date > cutoff_date }

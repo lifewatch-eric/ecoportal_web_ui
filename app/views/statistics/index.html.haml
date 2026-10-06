@@ -21,7 +21,7 @@
   %div.pb-3.pb-md-4
     - size = @merged_data[:labels].size - 1
     - visits =  @year_month_visits
-    = render TableComponent.new(id: 'statistics_table', paging: true, sort_column: '0', no_init_sort: true, show_all: true) do |t|
+    = render TableComponent.new(id: 'statistics_table', paging: true, sort_column: '0', show_all: true) do |t|
       - t.header do |h|
         - h.th {t('statistics.date')}
         - h.th {t('statistics.ontologies')}
@@ -48,19 +48,7 @@
         const year = parseInt(yearStr, 10);
         return new Date(year, month, 1);
       }
-      $.fn.dataTable.ext.errMode = 'none';
-      $.fn.dataTableExt.oSort["date-year-desc"] = function(x, y) {
-        return parseMonthYear(x) > parseMonthYear(y) ? -1 : 1
-      }
-      $.fn.dataTableExt.oSort["date-year-asc"] = function(x, y) {
-        return parseMonthYear(x) > parseMonthYear(y) ? 1 : -1
-      }
-      $("#statistics_table").dataTable({
-        order: [[0, 'desc']],
-        columnDefs: [
-          {
-            type: "date-year",
-            targets: 0
-          }
-        ]
+      document.querySelectorAll('#statistics_table tbody tr').forEach((row) => {
+        const dateCell = row.cells[0];
+        dateCell.dataset.order = parseMonthYear(dateCell.textContent.trim()).getTime();
       })

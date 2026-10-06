@@ -92,7 +92,7 @@ module StatisticsHelper
   end
 
   def merge_time_evolution_data(data)
-    min_year = data.map { |x| x.keys.first&.first }.compact.min
+    min_year = [data.map { |x| x.keys.first&.first }.compact.min || 2020, 2020].min
     old = data.size.times.map { |x|  0 }
 
     visits_data = { visits: data.size.times.map { |x|  [] }, labels: [] }
@@ -106,7 +106,7 @@ module StatisticsHelper
           old[i] += x[[year, month]]&.size || 0
         end
 
-        next if old.sum.zero?
+        next if year < 2020
 
         data.each_index do |i|
           visits_data[:visits][i] << old[i]
