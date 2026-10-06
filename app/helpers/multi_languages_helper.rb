@@ -42,7 +42,7 @@ module MultiLanguagesHelper
   def portal_languages
     {
       en: { badge: nil, disabled: false },
-      fr: { badge: nil, disabled: false },
+      fr: { badge: nil, disabled: true },
       it: { badge: 'coming', disabled: true },
       de: { badge: 'coming', disabled: true }
     }

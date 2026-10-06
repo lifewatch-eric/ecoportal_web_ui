@@ -23,11 +23,10 @@ class ApplicationController < ActionController::Base
 
   # Sets the locale based on the locale cookie or the value returned by detect_locale.
   def set_locale
-    I18n.locale = cookies[:locale] || detect_locale
-    cookies.permanent[:locale] = I18n.locale if cookies[:locale].nil?
+    locale = (cookies[:locale] || detect_locale).to_s.to_sym
+    I18n.locale = portal_language_enabled?(locale) ? locale : I18n.default_locale
+    cookies.permanent[:locale] = I18n.locale if cookies[:locale] != I18n.locale.to_s
     logger.debug "* Locale set to '#{I18n.locale}'"
-
-    I18n.locale = portal_lang unless portal_language_enabled?(I18n.locale)
 
     session[:locale] = I18n.locale
   end
