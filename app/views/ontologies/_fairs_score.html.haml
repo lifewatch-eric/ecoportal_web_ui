@@ -9,7 +9,7 @@
 %div.text-center
   - text = " <span>#{t("ontologies.see_details")}</span>"
   - combined_param = id_prefix == "ont-foops" ? "&foops=true" : ""
-  - modal_title_key = id_prefix == "ont-foops" ? "ontologies.fairness_assessment_questions_foops" : "ontologies.fairness_assessment_questions_ofaire"
+  - modal_title_key = id_prefix == "ont-foops" ? "ontologies.fairness_assessment_questions_foops" : "ontologies.fairness_assessment_questions"
   = link_to_modal(text.html_safe,
                 "/ajax/fair_score/html/?ontologies=#{@ontology.acronym}#{combined_param}",
                 class: "btn",
@@ -18,11 +18,12 @@
                 )
 
 
-:javascript
-  jQuery(document).ready(() => {
-     if(window.location.href.includes("#fair-details")){
-        jQuery('#fair-details-link')[0].click()
-     }
-  })
+- if id_prefix == "ont-fair"
+  :javascript
+    document.addEventListener('turbo:load', () => {
+      if (window.location.hash === '#fair-details') {
+        setTimeout(() => document.getElementById('ont-fair-details-link')?.click(), 0)
+      }
+    }, { once: true })
 
 

@@ -80,7 +80,7 @@
                               %span.badge.badge-pill.badge-light
                                 #{ print_score(question[1]["score"])} / #{print_score(question[1]["maxCredits"])}
                         - if !@is_foops && question[0].eql?('R1.3Q2') && @groups.blank?
-                          = empty_state(t('taxonomy.no_taxonomy_created', type: 'groups'))
+                          = empty_state(text: t('taxonomy.no_taxonomy_created', type: 'groups'))
                         %div.mb-3
                           - if @is_foops
                             - if question[1]["score"] == question[1]["maxCredits"]
