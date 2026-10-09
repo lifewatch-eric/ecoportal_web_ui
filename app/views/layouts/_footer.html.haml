@@ -20,7 +20,7 @@
           %div
 
             - section_links.each do |section , link|
-              - next if section == :release_notes
+              - next if %i[release_notes projects].include?(section)
               - anchor = I18n.t("layout.footer.#{section}_anchor", default: "")
               %a{:href => "#{link}#{anchor}", :target => "_blank"}
                 = t("layout.footer."+section.to_s)

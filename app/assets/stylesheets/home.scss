@@ -695,6 +695,17 @@ i.fa.fa-caret-square-o-down {
   }
 }
 
+@media (min-width: 1301px) {
+  .home-statistics-container > .home-statistics {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .home-statistics > :not(:last-child) {
+    margin-right: 0;
+  }
+}
+
 @media (max-width: 1300px) {
   .home-section {
     width: 100%;

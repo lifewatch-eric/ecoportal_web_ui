@@ -1534,7 +1534,7 @@ en:
     deprecated_help: A semantic resource with status retired shall necessarily be also deprecated, but not the opposite.
     edit_metadata_instruction: Edit the metadata of your semantic resource here. Some of these
       values are used by %{portal_name} functionalities, including for FAIRness assessment.
-      %{link)
+      %{link}
     edit_metadata_instruction_link: See guidelines and recommendations for metadata
       here.
     edit_ontology_title: Edit semantic resource
@@ -1611,7 +1611,7 @@ en:
     toggle_dropdown: Toggle dropdown
     version: Version
   taxonomy:
-    description: '"In %{portal}, semantic resources are organized in groups and tagged with categories. Typically, groups associate semantic resources from the same project or organization for better identification of the provenance. Whereas categories are about subjects/topics and enable to classify semantic resources. As of 2016, %{portal}''s categories were established in cooperation with FAO AIMS. In 2024, we moved to UNESCO Thesaurus (https://vocabularies.unesco.org). Groups and categories, along with other metadata, can be used on the “Browse” page of %{portal} to filter out the list of semantic resources."'
+    description: The categories section of %{portal} organises semantic resources into key thematic areas relevant to the ecological and other related domains. These categories were originally taken from GEMET or defined internally and integrated in 2024 to align with the top categories with the UNESCO Thesaurus, enabling a more structured and accessible browsing experience.
     groups_and_categories: Groups and Categories
     no_taxonomy_created: No %{type} are created yet
     show_sub_categories: Show sub categories

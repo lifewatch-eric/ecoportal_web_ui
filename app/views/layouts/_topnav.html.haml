@@ -53,6 +53,8 @@
               = link_to("Landscape", "/landscape")
             - s.item do
               = link_to(t('taxonomy.groups_and_categories'), '/groups')
+            - s.item do
+              = link_to(t('layout.footer.projects'), '/projects')
             - if sparql_enabled?
               - s.item do
                 = link_to(t("layout.header.sparql_editor"), "/sparql")
