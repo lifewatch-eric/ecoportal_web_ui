@@ -17,10 +17,6 @@
             = render :partial =>'instances/instances' , locals: {id: "class-instances-data-table"}
 
 
-        - tab_item_component(container_tabs: c, title: t('concepts.visualization'), path: '#visualization') do
-          = render :partial =>'/concepts/biomixer'
-
-
         - count_span = content_tag(:span, "#{t('concepts.notes')} (#{content_tag(:span, @notes.length, id: 'note_count')})".html_safe)
         - notes_link = api_button_link_and_target("#{baseClassUrl}/notes")[0]
         - tab_item_component(container_tabs: c, title: count_span, path: '#notes', json_link: notes_link) do
