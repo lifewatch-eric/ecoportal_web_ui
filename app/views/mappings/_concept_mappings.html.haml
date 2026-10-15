@@ -3,7 +3,7 @@
 
 = turbo_frame_tag @type.eql?('modal') ? 'application_modal_content' : 'concept_mappings' do
   %div.p-1
-    .mb-3
+    .d-inline-block.mb-3
       - if session[:user].nil?
         = link_to t('mappings.create_new_mapping'), "/login?redirect=/ontologies/#{@ontology.acronym}/?p=classes&t=mappings&conceptid=#{escape(@concept.id)}", class: "secondary-button regular-button slim", data: { turbo_frame: '_top' }
       - else
