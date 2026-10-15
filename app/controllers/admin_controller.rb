@@ -1,5 +1,6 @@
 class AdminController < ApplicationController
   include TurboHelper, HomeHelper, SparqlHelper, AdminHelper
+  include DoiRequestAdministration
   layout :determine_layout
   before_action :authorize_admin
   before_action :cache_setup
@@ -32,6 +33,12 @@ class AdminController < ApplicationController
   end
 
   def index
+  end
+
+  def jobs
+    json = LinkedData::Client::HTTP.get("#{ADMIN_URL}scheduled_jobs", raw: true)
+    @scheduledJobs = JSON.parse(json, symbolize_names: true)
+    render 'jobs', layout: nil
   end
 
   def metadata_administration

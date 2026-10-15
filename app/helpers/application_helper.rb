@@ -358,6 +358,9 @@ module ApplicationHelper
       ["/annotator", t("layout.header.annotator")],
       ["http://vocbench.lifewatchitaly.eu/", "VocBench"]
     ]
+    sparql_url = $FOOTER_LINKS.dig(:sections, :products, :sparql)
+    items.insert(4, [sparql_url, "SPARQL"]) if sparql_url.present?
+    items
   end
 
   def beta_badge(text = t('application.beta_badge_text'), tooltip: t('application.beta_badge_tooltip'))

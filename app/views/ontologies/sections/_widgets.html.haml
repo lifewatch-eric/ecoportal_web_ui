@@ -146,25 +146,6 @@
                 %a{:href => "http://bioontology.org/wiki/index.php/NCBO_Widgets#How_to_use_NCBO_Widgets", :target => "_blank"} NCBO Widget Wiki
 
 
-      %div
-        =  render WidgetBlockComponent.new(id: 'visualization-widget', title: t("ontologies.sections.widget_block_component_title_3"), description: t("ontologies.sections.widget_block_component_description_3", acronym: @ontology.acronym)) do |c|
-          - c.widget do
-            #bp_vis_container
-            - rest_domain = $REST_URL.sub(/https?:\/\//, "")
-            <iframe frameborder="0" src="/widgets/visualization?ontology=#{@ontology.acronym}&class=#{CGI.escape(first_class_id)}&apikey=#{$API_KEY}&restURLPrefix=#{rest_domain}" width="100%" height="350"></iframe>
-          - c.help_text do
-            %b= t("ontologies.sections.copy_and_paste")
-            %br
-            %br
-            %pre
-              = preserve do
-                :escaped
-                      <iframe frameborder="0" src="/widgets/visualization?ontology=#{@ontology.acronym}&class=#{CGI.escape(first_class_id)}&apikey=YOUR_API_KEY"></iframe>
-            %p
-              = t("ontologies.sections.more_help_visit")
-              %a{:href => "http://bioontology.org/wiki/index.php/NCBO_Widgets#How_to_use_NCBO_Widgets", :target => "_blank"} NCBO Widget Wiki
-
-
       - unless @ontology.flat?
         %div
           =  render WidgetBlockComponent.new(id: 'tree-widget', title: t("ontologies.sections.widget_block_component_title_4"), description: t("ontologies.sections.widget_block_component_description_4", acronym: @ontology.acronym)) do |c|

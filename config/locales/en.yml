@@ -706,6 +706,7 @@ en:
     info_tooltip_text: 'You are seing the average scores for all the public semantic resources in EcoPortal. FAIR scores are computed with the O''FAIRe methodology. More details here: https://github.com/agroportal/fairness'
     min: Min
     max: Max
+    resources: Resources
     ontologies: Semantic resources
     agents_tooltip: Top 5 agents with the highest semantic resource usage
     properties: Properties
@@ -884,6 +885,13 @@ en:
     date: Date
     ontology_visits: Semantic resource visits
   mappings:
+    mapping_table:
+      mapping_to: Mapping to
+      type: Type
+      no_mappings: There are currently no mappings for this class/concept.
+    bulk_loader:
+      loader:
+        example_of_valid_file: View an example of a valid file
     all: All
     description: Dive into an overview of the mappings in the bubble view, efficiently locate a specific semantic resource in the table view or upload your own mappings.
     intro_guide: The Mappings allows users to link terms across semantic artefacts, showing similarities between concepts. In the Bubble View, each bubble represents an artefact - clicking one reveals connected artefacts, and selecting a pair shows term mappings. Use the three tabs (Bubble View, Table View, and Upload Mappings) to explore, browse, or add your own mappings.
