@@ -16,5 +16,6 @@ Rails.application.config.after_initialize do
   $FOOTER_LINKS[:social].each do |link|
     link[:link] = "mailto:#{$SUPPORT_EMAIL}" if link[:logo] == 'social/email.svg'
   end
-  $FOOTER_LINKS[:sections][:agreements][:terms] = 'https://www.lifewatch.eu/terms-and-conditions/'
+  $TERMS_AND_CONDITIONS_LINK = 'https://www.lifewatch.eu/terms-and-conditions/'
+  $FOOTER_LINKS[:sections][:agreements][:terms] = $TERMS_AND_CONDITIONS_LINK
 end

@@ -706,6 +706,25 @@ i.fa.fa-caret-square-o-down {
   }
 }
 
+@media (min-width: 1301px) {
+  .home-sub-section-left,
+  .home-sub-section-middle {
+    display: flex;
+    flex-direction: column;
+  }
+  .home-fair-scores,
+  .home-sub-section-middle #agents_frame {
+    flex: 1;
+  }
+  .home-sub-section-middle #agents_frame {
+    display: flex;
+  }
+  .home-sub-section-middle .home-agents-container {
+    height: auto;
+    width: 100%;
+  }
+}
+
 @media (max-width: 1300px) {
   .home-section {
     width: 100%;
