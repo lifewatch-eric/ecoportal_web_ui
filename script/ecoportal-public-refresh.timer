@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily validated EcoPortal public SPARQL refresh
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+RandomizedDelaySec=5min
+Persistent=true
+Unit=ecoportal-public-refresh.service
+
+[Install]
+WantedBy=timers.target
