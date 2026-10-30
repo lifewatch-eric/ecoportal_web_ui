@@ -86,6 +86,36 @@ class PublicRefreshTest(unittest.TestCase):
             j.wait_public()
             self.assertEqual(2, requests.call_count)
 
+    def test_metadata_is_fetched_across_result_limit(self):
+        j = self.job
+        expected = [self.row('subject-' + str(i), 'type', 'value-' + str(i)) for i in range(1001)]
+        with mock.patch.object(j, 'count', return_value=1001), mock.patch.object(j, 'query', side_effect=[expected[:1000], expected[1000:]]):
+            self.assertEqual(expected, j.rows(18891, j.SUBMISSION))
+
+    def test_overlapping_pages_are_rejected(self):
+        j = self.job
+        page = [self.row('subject-' + str(i), 'type', 'value-' + str(i)) for i in range(1000)]
+        with mock.patch.object(j, 'count', return_value=1001), mock.patch.object(j, 'query', side_effect=[page, page[:1]]):
+            with self.assertRaises(RuntimeError):
+                j.rows(18891, j.SUBMISSION)
+
+    def test_native_paging_avoids_virtuoso_sorted_top_limit(self):
+        j = self.job
+        expected = [self.row('subject-' + str(i), 'type', 'value-' + str(i)) for i in range(10001)]
+        def provider(port, text):
+            offset = int(text.rsplit('OFFSET ', 1)[1])
+            if 'ORDER BY' in text and offset + 1000 > 10000:
+                raise RuntimeError('Virtuoso SR353: sorted TOP exceeds 10000')
+            return expected[offset:offset + 1000]
+        with mock.patch.object(j, 'count', return_value=10001), mock.patch.object(j, 'query', side_effect=provider):
+            self.assertEqual(expected, j.rows(18891, j.SUBMISSION))
+
+    def test_stopped_public_service_does_not_require_an_old_endpoint(self):
+        j = self.job
+        from types import SimpleNamespace
+        with mock.patch.object(j.subprocess, 'run', return_value=SimpleNamespace(returncode=3)), mock.patch.object(j, 'rows', side_effect=AssertionError('Stopped endpoint must not be queried')):
+            self.assertEqual((set(), False), j.previous_projection())
+
 
 if __name__ == '__main__':
     unittest.main()

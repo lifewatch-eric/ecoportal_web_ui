@@ -92,8 +92,14 @@ def graphs(port):
 
 
 def rows(port, graph):
-    found = query(port, 'SELECT ?s ?p ?o WHERE { GRAPH ' + iri(graph) + ' { ?s ?p ?o } }')
-    require(len(found) == count(port, graph), 'SPARQL metadata result is incomplete')
+    expected = count(port, graph)
+    found = []
+    # Native scans avoid the sorted-TOP cap; full counts and uniqueness reject unstable paging.
+    for offset in range(0, expected, 1000):
+        page = query(port, 'SELECT ?s ?p ?o WHERE { GRAPH ' + iri(graph) + ' { ?s ?p ?o } } LIMIT 1000 OFFSET ' + str(offset))
+        require(len(page) == min(1000, expected - offset), 'SPARQL metadata page is incomplete')
+        found.extend(page)
+    require(count(port, graph) == expected and len(statement_set(found)) == expected, 'SPARQL metadata changed or pages overlap')
     return found
 
 
@@ -219,7 +225,8 @@ def filter_stage(metadata, selected, public):
     require(graphs(HTTP) <= keep, 'Unapproved graph remained in staging')
     for graph, subjects in selected.items():
         expected = [r for r in metadata[graph] if r['s']['value'] in subjects]
-        require(statement_set(rows(HTTP, graph)) == statement_set(expected), 'Public metadata statement mismatch')
+        actual = rows(HTTP, graph)
+        require(statement_set(actual) == statement_set(expected), 'Public metadata statement mismatch in ' + graph + ' (expected ' + str(len(expected)) + ', actual ' + str(len(actual)) + ')')
     for graph, expected in content_counts.items():
         require(count(HTTP, graph) == expected, 'Retained graph count changed')
     require(all(count(HTTP, g) == 0 for g in SENSITIVE), 'Sensitive graph remained in staging')
@@ -230,6 +237,13 @@ def filter_stage(metadata, selected, public):
 def current_public_subjects():
     metadata = {ONTOLOGY: rows(8890, ONTOLOGY), SUBMISSION: []}
     return public_policy(metadata)[1]
+
+
+def previous_projection():
+    if subprocess.run(['systemctl', 'is-active', '--quiet', 'virtuoso-public']).returncode != 0:
+        return set(), False
+    subjects = {r['s']['value'] for r in rows(8891, ONTOLOGY)}
+    return subjects, all(count(8891, graph) == 0 for graph in SENSITIVE)
 
 
 def wait_public():
@@ -256,8 +270,7 @@ def refresh(interval):
         owner_name = subprocess.check_output(['systemctl', 'show', 'virtuoso-public', '-p', 'User', '--value'], text=True).strip()
         owner = pwd.getpwnam(owner_name)
         require(shutil.disk_usage(DATA).free > SOURCE.stat().st_size * 3 + 536870912, 'Insufficient refresh/rollback disk space')
-        old_public = {r['s']['value'] for r in rows(8891, ONTOLOGY)}
-        old_safe = all(count(8891, g) == 0 for g in SENSITIVE)
+        old_public, old_safe = previous_projection()
         folder = pathlib.Path(tempfile.mkdtemp(prefix='public-refresh-stage-', dir=DATA))
         os.chown(folder, owner.pw_uid, owner.pw_gid)
         (folder / 'db').mkdir(mode=0o700)
